@@ -18,15 +18,9 @@ function init() {
   );
   camera.position.set(-400, 300, 200);
   scene = new THREE.Scene();
-
+  scene.background = new THREE.Color(0xadd8e6);
   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  // scene.add(ambientLight);
-  const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(100, 100, 100),
-    new THREE.MeshBasicMaterial({ color: 0xffffff })
-  );
-  scene.add(cube);
-
+  scene.add(ambientLight);
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -50,13 +44,16 @@ importButton.addEventListener("click", () => {
   reader.onload = function (event) {
     const data = event.target.result;
     const geometry = stlLoader.parse(data);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xff0000,
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x049ef4,
+      specular: 0xffffff,
+      flatShading: true,
       side: THREE.DoubleSide,
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.receiveShadow = true;
     mesh.castShadow = true;
+    mesh.position.set(0, 0, 0);
     mesh.scale.set(5, 5, 5);
     scene.add(mesh);
   };
