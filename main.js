@@ -1,10 +1,19 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js";
-// import { STLExporter } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/exporters/STLExporter.js";
+import { STLExporter } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/exporters/STLExporter.js";
 import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/STLLoader.js";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js";
 let container;
 let camera, cameraTarget, scene, renderer, controls;
-
+const exportButton = document.getElementById("export");
+exportButton.addEventListener("click", () => {
+  const exporter = new STLExporter();
+  const output = exporter.parse(scene);
+  const blob = new Blob([output], { type: "application/octet-stream" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "model.stl";
+  a.click();
+});
 init();
 animate();
 
@@ -19,7 +28,6 @@ function init() {
   );
   camera.position.set(0, 0, 2);
   cameraTarget = new THREE.Vector3(0, 0, 0);
-
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x050505);
   scene.fog = new THREE.Fog(0x050505, 2, 15);
@@ -36,10 +44,9 @@ function init() {
     mesh.position.set(-0.1, -0.3, 0);
     mesh.rotation.set(-Math.PI / 2, 0, 0);
     mesh.scale.set(0.005, 0.005, 0.005);
-
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-
+    mesh.name = "main";
     scene.add(mesh);
   });
 
