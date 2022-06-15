@@ -23,7 +23,7 @@ function init() {
   camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
-    1,
+    0.1,
     100000
   );
   camera.position.set(0, 0, 2);
@@ -54,7 +54,7 @@ function init() {
 
   scene.add(new THREE.HemisphereLight(0x443333, 0x111122));
   addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-  addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+  addShadowedLight(0.5, 1, -1, 0xff0000, 1);
   // renderer
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -100,10 +100,6 @@ function animate() {
 }
 
 function render() {
-  // const timer = Date.now() * 0.0005;
-  // camera.position.x = Math.cos(timer) * 3;
-  // camera.position.z = Math.sin(timer) * 3;
-
   camera.lookAt(cameraTarget);
   controls.update();
   renderer.render(scene, camera);
