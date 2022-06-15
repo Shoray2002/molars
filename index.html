@@ -1,36 +1,22 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Viewstl Javascript Plugin - Files manipulations Example</title>
-        <script src="ie_polyfills.js"></script>
-    </head>
+<html lang="en">
 
-    <body>
-        <div id="stl_cont" style="width:1500px;height:800px;margin:0 auto;border:1px dashed black;"></div>
+<head>
+  <title>MOLARS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+</head>
+<link rel="stylesheet" href="./style.css" />
 
-        <script src="/general/jszip.min.js"></script>
-        <script src="/general/jszip-utils.min.js"></script>
+<body>
+  <div class="interactives">
+    <!-- <div class="buttons">
+      <input type="file" name="" id="fileInput">
+      <div id="import" class="button">Import</div>
+      <div id="export" class="button">Export</div>
+    </div> -->
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
 
-        <script src="stl_viewer.min.js"></script>        
-        <script>
-            var camera_state=null;
-            var stl_viewer=new StlViewer
-            (
-                document.getElementById("stl_cont"),
-                {
-                    allow_drag_and_drop:true
-                }
-            );
-        </script>
-        
-        <input type="button" onclick="stl_viewer.download_model(1);" value="Download model as STL">
-        <br><br>
-        <input type="button" onclick="alert(stl_viewer.get_vsj());" value="Show VSJ">
-        <input type="button" onclick="stl_viewer.download_vsj('viewstl_scene.vsj');" value="Download scene as VSJ">
-        <input type="button" onclick="stl_viewer.download_vsb('viewstl_scene.vsb');" value="Download scene as VSB">
-        <input type="button" onclick="stl_viewer.get_vsb_blob('viewstl_scene.vsb').then(function (content) {alert('see console for blob');console.log('my vsb as blob: ', content);});" value="Get VSB as BLOB">
-        <br><br>
-        <input type="file" onchange="stl_viewer.load_vsj(this.files[0]);">Load VSJ from file
-        <br><input type="file" onchange="stl_viewer.load_vsb(this.files[0]);">Load VSB from file
-    </body>
 </html>
