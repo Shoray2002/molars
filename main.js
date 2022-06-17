@@ -73,9 +73,12 @@ function init() {
   group.rotation.x = Math.PI / 3;
   scene.add(group);
   // Light
-  let light = new THREE.PointLight(0xffffff, 1.5);
+  let light = new THREE.PointLight(0x6c6b6b, 1.5);
   light.position.set(1000, 1000, 2000);
   scene.add(light);
+
+  let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1.5);
+  scene.add(ambientLight);
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -177,7 +180,7 @@ function addModel() {
       new THREE.MeshPhongMaterial({
         color: 0xffffff,
         specular: 0xe5e5e5,
-        shininess: 10,
+        shininess: 1,
         side: THREE.DoubleSide,
       }),
       new THREE.MeshBasicMaterial({
