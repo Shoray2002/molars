@@ -65,8 +65,9 @@ function init() {
     1,
     100000
   );
-  camera.position.z = 1500;
-
+  camera.position.y = 500;
+  camera.position.z = 300;
+  camera.lookAt(new THREE.Vector3(0, 0, 300));
   scene = new THREE.Scene();
 
   // Light
@@ -158,7 +159,7 @@ function render() {
 }
 
 function addModel() {
-  loaderSTL.load("./mesh.stl", function (geometry) {
+  loaderSTL.load("./jaw.stl", function (geometry) {
     orig_geom = geometry;
     if (smooth_mesh) {
       scene.remove(group);
@@ -170,25 +171,6 @@ function addModel() {
     smooth_geom.computeFaceNormals();
     smooth_geom.computeVertexNormals();
     subd_modifier.modify(smooth_geom);
-
-    let faceABCD = "abcd";
-    let color, f, p, n, vertexIndex;
-
-    for (let i = 0; i < smooth_geom.faces.length; i++) {
-      f = smooth_geom.faces[i];
-      n = f instanceof THREE.Face3 ? 3 : 4;
-
-      for (let j = 0; j < n; j++) {
-        vertexIndex = f[faceABCD.charAt(j)];
-
-        p = smooth_geom.vertices[vertexIndex];
-
-        color = new THREE.Color(0xffffff);
-        color.setHSL(p.y / 200 + 0.5, 1.0, 0.5);
-
-        f.vertexColors[j] = color;
-      }
-    }
 
     const group = new THREE.Group();
     scene.add(group);
