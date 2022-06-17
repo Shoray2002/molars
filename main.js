@@ -19,27 +19,27 @@ let ffd = new FFD();
 let MIN_SPAN_COUNT = 1;
 let MAX_SPAN_COUNT = 8;
 let span_counts = [2, 2, 2];
-let ctrl_pt_geom = new THREE.SphereGeometry(2.5);
+let ctrl_pt_geom = new THREE.SphereGeometry(2.5, 32, 32);
 let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0xfff000 });
 let ctrl_pt_meshes = [];
 let ctrl_pt_mesh_selected = null;
 let lattice_lines = [];
 let lattice_line_material = new THREE.LineBasicMaterial({
-  color: 0x000000,
+  color: 0xffffff,
   transparent: true,
   opacity: 0.3,
 });
 let models = [];
 let selected_model = null;
 // Evaluated points
-let eval_pt_spans = new THREE.Vector3(16, 16, 16);
-let eval_pt_counts = new THREE.Vector3(
-  eval_pt_spans.x + 1,
-  eval_pt_spans.y + 1,
-  eval_pt_spans.z + 1
-);
-let eval_pts_geom = new THREE.Geometry();
-let eval_pts_mesh;
+// let eval_pt_spans = new THREE.Vector3(16, 16, 16);
+// let eval_pt_counts = new THREE.Vector3(
+//   eval_pt_spans.x + 1,
+//   eval_pt_spans.y + 1,
+//   eval_pt_spans.z + 1
+// );
+// let eval_pts_geom = new THREE.Geometry();
+// let eval_pts_mesh;
 
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
@@ -84,7 +84,7 @@ function init() {
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-  renderer.setClearColor(0xf0f0f0);
+  renderer.setClearColor(0x000000);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.domElement.addEventListener("mousemove", onDocumentMouseMove, false);
