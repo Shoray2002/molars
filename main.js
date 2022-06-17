@@ -57,6 +57,7 @@ const loaderSTL = new THREE.STLLoader();
 
 // start scene
 init();
+console.log(models);
 animate();
 
 function init() {
@@ -148,7 +149,6 @@ function onDocumentMouseDown(event) {
     orbit_ctrl.enabled = false;
     if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
     ctrl_pt_mesh_selected = intersects[0].object;
-    console.log(ctrl_pt_mesh_selected.name);
     trfm_ctrl.attach(ctrl_pt_mesh_selected);
   } else {
     orbit_ctrl.enabled = true;
@@ -160,7 +160,8 @@ function modelSelection(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
   let intersects = raycaster.intersectObjects(models);
-  if (intersects.length > 0) {
+  console.log(intersects);
+  if (intersects.length > 0 && intersects[0].object != selected_model) {
     selected_model = intersects[0].object;
     smooth_verts_undeformed.length = 0;
     for (let i = 0; i < smooth_geom.vertices.length; i++) {
@@ -177,7 +178,8 @@ function keyDown(event) {
     console.log("esc");
     removeCtrlPtMeshes();
     removeLatticeLines();
-    // trfm_ctrl.detach(trfm_ctrl.object);
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = null;
   }
 }
 
@@ -234,8 +236,8 @@ function addModel() {
 }
 
 function rebuildFFD(span_count_change_only) {
-  removeCtrlPtMeshes();
-  removeLatticeLines();
+  // removeCtrlPtMeshes();
+  // removeLatticeLines();
 
   let bbox;
   if (span_count_change_only) {
@@ -272,7 +274,6 @@ function addCtrlPtMeshes() {
     let ctrl_pt_mesh = new THREE.Mesh(ctrl_pt_geom, ctrl_pt_material);
     ctrl_pt_mesh.position.copy(ffd.getPosition(i));
     ctrl_pt_mesh.material.ambient = ctrl_pt_mesh.material.color;
-    ctrl_pt_mesh.name = "ctrl_pt_mesh" + i;
     ctrl_pt_meshes.push(ctrl_pt_mesh);
     group.add(ctrl_pt_mesh);
   }
