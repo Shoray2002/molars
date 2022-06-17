@@ -65,10 +65,11 @@ function init() {
     1,
     100000
   );
-  camera.position.z = 1000;
+  camera.position.z = 650;
   scene = new THREE.Scene();
   // Group
   group = new THREE.Group();
+  group.translateY(100);
   group.rotation.x = Math.PI / 3;
   scene.add(group);
   // Light
@@ -99,7 +100,7 @@ function init() {
 
   window.addEventListener("resize", onWindowResize, false);
 
-  createEvalPtsMesh();
+  // createEvalPtsMesh();
   addModel();
 
   exportButton.addEventListener("click", function () {
@@ -298,17 +299,17 @@ function addLatticeLines() {
   }
 }
 
-function createEvalPtsMesh() {
-  let total_eval_pts_count =
-    eval_pt_counts.x * eval_pt_counts.y * eval_pt_counts.z;
-  for (let i = 0; i < total_eval_pts_count; i++)
-    eval_pts_geom.vertices.push(new THREE.Vector3());
-  eval_pts_mesh = new THREE.Points(
-    eval_pts_geom.clone(),
-    new THREE.PointsMaterial({ color: 0xff0000, size: 2 })
-  );
-  group.add(eval_pts_mesh);
-}
+// function createEvalPtsMesh() {
+//   let total_eval_pts_count =
+//     eval_pt_counts.x * eval_pt_counts.y * eval_pt_counts.z;
+//   for (let i = 0; i < total_eval_pts_count; i++)
+//     eval_pts_geom.vertices.push(new THREE.Vector3());
+//   eval_pts_mesh = new THREE.Points(
+//     eval_pts_geom.clone(),
+//     new THREE.PointsMaterial({ color: 0xff0000, size: 2 })
+//   );
+//   group.add(eval_pts_mesh);
+// }
 
 function updateLattice() {
   for (let i = 0; i < ffd.getTotalCtrlPtCount(); i++)
