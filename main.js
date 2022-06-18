@@ -6,7 +6,9 @@ let camera,
   trfm_ctrl,
   orig_geom,
   smooth_geom,
-  group;
+  temp_mesh,
+  upper_jaw,
+  lower_jaw;
 const exportButton = document.getElementById("export");
 const canvas = document.getElementById("canvas");
 let subd_level = 0;
@@ -31,29 +33,10 @@ let lattice_line_material = new THREE.LineBasicMaterial({
 });
 let models = [];
 let selected_model = null;
-// Evaluated points
-// let eval_pt_spans = new THREE.Vector3(16, 16, 16);
-// let eval_pt_counts = new THREE.Vector3(
-//   eval_pt_spans.x + 1,
-//   eval_pt_spans.y + 1,
-//   eval_pt_spans.z + 1
-// );
-// let eval_pts_geom = new THREE.Geometry();
-// let eval_pts_mesh;
-
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
 const exporter = new THREE.STLExporter();
-let createSomething = function (klass, args) {
-  let F = function (klass, args) {
-    return klass.apply(this, args);
-  };
-  F.prototype = klass.prototype;
-  return new F(klass, args);
-};
-
-// const loaderSTL = new THREE.STLLoader();
 const loaderOBJ = new THREE.OBJLoader();
 // start scene
 init();
@@ -69,10 +52,14 @@ function init() {
   camera.position.z = 650;
   scene = new THREE.Scene();
   // Group
-  group = new THREE.Group();
-  group.translateY(100);
-  group.rotation.x = Math.PI / 3;
-  scene.add(group);
+  upper_jaw = new THREE.Group();
+  upper_jaw.translateY(100);
+  upper_jaw.rotation.x = Math.PI / 3;
+  scene.add(upper_jaw);
+  lower_jaw = new THREE.Group();
+  lower_jaw.translateY(20);
+  lower_jaw.rotation.x = Math.PI / 3;
+  scene.add(lower_jaw);
   // Light
   let light = new THREE.PointLight(0x6c6b6b, 1.5);
   light.position.set(1000, 1000, 2000);
@@ -96,7 +83,6 @@ function init() {
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
   trfm_ctrl.addEventListener("change", render);
   scene.add(trfm_ctrl);
-
   trfm_ctrl.addEventListener("objectChange", function (e) {
     updateLattice();
     deform();
@@ -107,10 +93,9 @@ function init() {
   window.addEventListener("keydown", keyDown, false);
   // createEvalPtsMesh();
   addModel();
-
   exportButton.addEventListener("click", function () {
-    let stl = exporter.parse(smooth_mesh);
-    let blob = new Blob([stl], { type: "text/plain" });
+    let lower = exporter.parse(lower_jaw);
+    let blob = new Blob([lower], { type: "application/octet-stream" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "mesh.stl";
@@ -160,6 +145,7 @@ function modelSelection(event) {
   raycaster.setFromCamera(mouse, camera);
   let intersects = raycaster.intersectObjects(models);
   if (intersects.length > 0 && intersects[0].object != selected_model) {
+    console.log(intersects[0].object);
     selected_model = intersects[0].object;
     smooth_verts_undeformed.length = 0;
     for (let i = 0; i < smooth_geom.vertices.length; i++) {
@@ -173,7 +159,6 @@ function modelSelection(event) {
 function keyDown(event) {
   // esc
   if (event.keyCode == 27) {
-    console.log("esc");
     removeCtrlPtMeshes();
     removeLatticeLines();
     trfm_ctrl.detach(trfm_ctrl.object);
@@ -193,19 +178,15 @@ function render() {
 }
 
 function addModel() {
-  // for (let i = 0; i < model_names.length; i++) {
-    loaderOBJ.load(`/models/${model_names[0]}.obj`, function (object) {
+  for (let i = 0; i < model_names.length; i++) {
+    loaderOBJ.load(`/models/${model_names[i]}.obj`, function (object) {
       let mesh = object.children[0];
       orig_geom = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-      // if (smooth_mesh) {
-      //   scene.remove(group);
-      //   scene.remove(smooth_mesh);
-      // }
       let subd_modifier = new THREE.SubdivisionModifier(subd_level);
       smooth_geom = orig_geom.clone();
-      // smooth_geom.mergeVertices();
-      // smooth_geom.computeFaceNormals();
-      // smooth_geom.computeVertexNormals();
+      smooth_geom.mergeVertices();
+      smooth_geom.computeFaceNormals();
+      smooth_geom.computeVertexNormals();
       subd_modifier.modify(smooth_geom);
       let smooth_materials = [
         new THREE.MeshPhongMaterial({
@@ -225,17 +206,19 @@ function addModel() {
         smooth_geom,
         smooth_materials
       );
-      console.log(smooth_mesh);
-      let temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials[0]);
+      temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials[0]);
       model_scale = 1;
-      // console.log(temp_mesh)
       smooth_mesh.scale.x = model_scale;
       smooth_mesh.scale.y = model_scale;
       smooth_mesh.scale.z = model_scale;
       models.push(temp_mesh);
-      group.add(smooth_mesh);
+      if (i > 0) {
+        lower_jaw.add(smooth_mesh);
+      } else {
+        upper_jaw.add(smooth_mesh);
+      }
     });
-  // }
+  }
 }
 
 function rebuildFFD(span_count_change_only) {
@@ -263,12 +246,13 @@ function rebuildFFD(span_count_change_only) {
 
 function removeCtrlPtMeshes() {
   for (let i = 0; i < ctrl_pt_meshes.length; i++)
-    group.remove(ctrl_pt_meshes[i]);
+    upper_jaw.remove(ctrl_pt_meshes[i]);
   ctrl_pt_meshes.length = 0;
 }
 
 function removeLatticeLines() {
-  for (let i = 0; i < lattice_lines.length; i++) group.remove(lattice_lines[i]);
+  for (let i = 0; i < lattice_lines.length; i++)
+    upper_jaw.remove(lattice_lines[i]);
   lattice_lines.length = 0;
 }
 
@@ -279,7 +263,7 @@ function addCtrlPtMeshes() {
     ctrl_pt_mesh.material.ambient = ctrl_pt_mesh.material.color;
     ctrl_pt_mesh.name = "ctrl_pt_mesh" + i;
     ctrl_pt_meshes.push(ctrl_pt_mesh);
-    group.add(ctrl_pt_mesh);
+    upper_jaw.add(ctrl_pt_mesh);
   }
 }
 
@@ -295,7 +279,7 @@ function addLatticeLines() {
         let line = new THREE.Line(geometry, lattice_line_material);
 
         lattice_lines.push(line);
-        group.add(line);
+        upper_jaw.add(line);
       }
     }
   }
@@ -308,9 +292,8 @@ function addLatticeLines() {
           ctrl_pt_meshes[ffd.getIndex(i, j + 1, k)].position
         );
         let line = new THREE.Line(geometry, lattice_line_material);
-
         lattice_lines.push(line);
-        group.add(line);
+        upper_jaw.add(line);
       }
     }
   }
@@ -325,7 +308,7 @@ function addLatticeLines() {
         let line = new THREE.Line(geometry, lattice_line_material);
 
         lattice_lines.push(line);
-        group.add(line);
+        upper_jaw.add(line);
       }
     }
   }
