@@ -18,9 +18,7 @@ let model_scale;
 let model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 // FFD: control points of a lattice
 let ffd = new FFD();
-let MIN_SPAN_COUNT = 1;
-let MAX_SPAN_COUNT = 8;
-let span_counts = [2, 2, 2];
+let span_counts = [2, 2, 3];
 let ctrl_pt_geom = new THREE.SphereGeometry(2.5, 32, 32);
 let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0xfff000 });
 let ctrl_pt_meshes = [];
@@ -29,7 +27,7 @@ let lattice_lines = [];
 let lattice_line_material = new THREE.LineBasicMaterial({
   color: 0xffffff,
   transparent: true,
-  opacity: 0.3,
+  opacity: 0.5,
 });
 let models = [];
 let selected_model = null;
@@ -127,7 +125,7 @@ function onDocumentMouseDown(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
-  let intersects = raycaster.intersectObjects(ctrl_pt_meshes);
+  let intersects = raycaster.intersectObjects(ctrl_pt_meshes, false);
   if (intersects.length > 0 && ctrl_pt_mesh_selected != intersects[0].object) {
     orbit_ctrl.enabled = false;
     console.log(intersects[0].object.name);
@@ -148,10 +146,10 @@ function modelSelection(event) {
     console.log(intersects[0].object);
     selected_model = intersects[0].object;
     smooth_verts_undeformed.length = 0;
-    for (let i = 0; i < smooth_geom.vertices.length; i++) {
-      let copy_pt = new THREE.Vector3();
-      copy_pt.copy(selected_model.geometry.vertices[i]);
-      smooth_verts_undeformed.push(copy_pt);
+    for (let i = 0; i < selected_model.geometry.vertices.length; i++) {
+      let copy_vertex = new THREE.Vector3();
+      copy_vertex.copy(selected_model.geometry.vertices[i]);
+      smooth_verts_undeformed.push(copy_vertex);
     }
     rebuildFFD(false);
   }
@@ -221,22 +219,19 @@ function addModel() {
   }
 }
 
-function rebuildFFD(span_count_change_only) {
+function rebuildFFD() {
   // removeCtrlPtMeshes();
   // removeLatticeLines();
 
   let bbox;
-  if (span_count_change_only) {
-    bbox = ffd.getBoundingBox();
-  } else {
-    bbox = new THREE.Box3();
-    bbox.setFromPoints(smooth_geom.vertices);
-    if (model_scale != 1)
-      bbox.set(
-        bbox.min.multiplyScalar(model_scale),
-        bbox.max.multiplyScalar(model_scale)
-      );
-  }
+  bbox = new THREE.Box3();
+  bbox.setFromPoints(smooth_geom.vertices);
+  if (model_scale != 1)
+    bbox.set(
+      bbox.min.multiplyScalar(model_scale),
+      bbox.max.multiplyScalar(model_scale)
+    );
+
   let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
   ffd.rebuildLattice(bbox, span_counts_copy);
   addCtrlPtMeshes();
