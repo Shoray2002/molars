@@ -13,7 +13,7 @@ let subd_level = 0;
 let smooth_mesh;
 let smooth_verts_undeformed = [];
 let model_scale;
-
+let model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 // FFD: control points of a lattice
 let ffd = new FFD();
 let MIN_SPAN_COUNT = 1;
@@ -121,7 +121,6 @@ function init() {
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
@@ -194,47 +193,49 @@ function render() {
 }
 
 function addModel() {
-  loaderOBJ.load("./models/jaw.obj", function (object) {
-    let mesh = object.children[0];
-    orig_geom = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-    // if (smooth_mesh) {
-    //   scene.remove(group);
-    //   scene.remove(smooth_mesh);
-    // }
-    let subd_modifier = new THREE.SubdivisionModifier(subd_level);
-    smooth_geom = orig_geom.clone();
-    // smooth_geom.mergeVertices();
-    // smooth_geom.computeFaceNormals();
-    // smooth_geom.computeVertexNormals();
-    subd_modifier.modify(smooth_geom);
-    let smooth_materials = [
-      new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        specular: 0xe5e5e5,
-        shininess: 1,
-        side: THREE.DoubleSide,
-      }),
-      new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        wireframe: true,
-        opacity: 0.1,
-        transparent: true,
-      }),
-    ];
-    smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
-      smooth_geom,
-      smooth_materials
-    );
-    console.log(smooth_mesh);
-    let temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials[0]);
-    model_scale = 1;
-    // console.log(temp_mesh)
-    smooth_mesh.scale.x = model_scale;
-    smooth_mesh.scale.y = model_scale;
-    smooth_mesh.scale.z = model_scale;
-    models.push(temp_mesh);
-    group.add(smooth_mesh);
-  });
+  // for (let i = 0; i < model_names.length; i++) {
+    loaderOBJ.load(`/models/${model_names[0]}.obj`, function (object) {
+      let mesh = object.children[0];
+      orig_geom = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+      // if (smooth_mesh) {
+      //   scene.remove(group);
+      //   scene.remove(smooth_mesh);
+      // }
+      let subd_modifier = new THREE.SubdivisionModifier(subd_level);
+      smooth_geom = orig_geom.clone();
+      // smooth_geom.mergeVertices();
+      // smooth_geom.computeFaceNormals();
+      // smooth_geom.computeVertexNormals();
+      subd_modifier.modify(smooth_geom);
+      let smooth_materials = [
+        new THREE.MeshPhongMaterial({
+          color: 0xffffff,
+          specular: 0xe5e5e5,
+          shininess: 1,
+          side: THREE.DoubleSide,
+        }),
+        new THREE.MeshBasicMaterial({
+          color: 0x000000,
+          wireframe: true,
+          opacity: 0.1,
+          transparent: true,
+        }),
+      ];
+      smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+        smooth_geom,
+        smooth_materials
+      );
+      console.log(smooth_mesh);
+      let temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials[0]);
+      model_scale = 1;
+      // console.log(temp_mesh)
+      smooth_mesh.scale.x = model_scale;
+      smooth_mesh.scale.y = model_scale;
+      smooth_mesh.scale.z = model_scale;
+      models.push(temp_mesh);
+      group.add(smooth_mesh);
+    });
+  // }
 }
 
 function rebuildFFD(span_count_change_only) {
