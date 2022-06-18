@@ -53,7 +53,7 @@ let createSomething = function (klass, args) {
   return new F(klass, args);
 };
 
-const loaderSTL = new THREE.STLLoader();
+// const loaderSTL = new THREE.STLLoader();
 const loaderOBJ = new THREE.OBJLoader();
 // start scene
 init();
@@ -146,7 +146,7 @@ function onDocumentMouseDown(event) {
   let intersects = raycaster.intersectObjects(ctrl_pt_meshes);
   if (intersects.length > 0 && ctrl_pt_mesh_selected != intersects[0].object) {
     orbit_ctrl.enabled = false;
-    console.log(intersects[0].object.name)
+    console.log(intersects[0].object.name);
     if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
     ctrl_pt_mesh_selected = intersects[0].object;
     trfm_ctrl.attach(ctrl_pt_mesh_selected);
@@ -194,10 +194,9 @@ function render() {
 }
 
 function addModel() {
-  loaderOBJ.load("./tooth.obj", function (object) {
+  loaderOBJ.load("./models/jaw.obj", function (object) {
     let mesh = object.children[0];
     orig_geom = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-    console.log(scene);
     // if (smooth_mesh) {
     //   scene.remove(group);
     //   scene.remove(smooth_mesh);
