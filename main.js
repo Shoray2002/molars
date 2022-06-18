@@ -54,10 +54,9 @@ let createSomething = function (klass, args) {
 };
 
 const loaderSTL = new THREE.STLLoader();
-
+const loaderOBJ = new THREE.OBJLoader();
 // start scene
 init();
-console.log(models);
 animate();
 
 function init() {
@@ -147,6 +146,7 @@ function onDocumentMouseDown(event) {
   let intersects = raycaster.intersectObjects(ctrl_pt_meshes);
   if (intersects.length > 0 && ctrl_pt_mesh_selected != intersects[0].object) {
     orbit_ctrl.enabled = false;
+    console.log(intersects[0].object.name)
     if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
     ctrl_pt_mesh_selected = intersects[0].object;
     trfm_ctrl.attach(ctrl_pt_mesh_selected);
@@ -160,7 +160,6 @@ function modelSelection(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
   let intersects = raycaster.intersectObjects(models);
-  console.log(intersects);
   if (intersects.length > 0 && intersects[0].object != selected_model) {
     selected_model = intersects[0].object;
     smooth_verts_undeformed.length = 0;
@@ -195,17 +194,19 @@ function render() {
 }
 
 function addModel() {
-  loaderSTL.load("./jaw.stl", function (geometry) {
-    orig_geom = geometry;
+  loaderOBJ.load("./tooth.obj", function (object) {
+    let mesh = object.children[0];
+    orig_geom = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+    console.log(scene);
     // if (smooth_mesh) {
     //   scene.remove(group);
     //   scene.remove(smooth_mesh);
     // }
     let subd_modifier = new THREE.SubdivisionModifier(subd_level);
     smooth_geom = orig_geom.clone();
-    smooth_geom.mergeVertices();
-    smooth_geom.computeFaceNormals();
-    smooth_geom.computeVertexNormals();
+    // smooth_geom.mergeVertices();
+    // smooth_geom.computeFaceNormals();
+    // smooth_geom.computeVertexNormals();
     subd_modifier.modify(smooth_geom);
     let smooth_materials = [
       new THREE.MeshPhongMaterial({
@@ -225,8 +226,10 @@ function addModel() {
       smooth_geom,
       smooth_materials
     );
+    console.log(smooth_mesh);
     let temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials[0]);
     model_scale = 1;
+    // console.log(temp_mesh)
     smooth_mesh.scale.x = model_scale;
     smooth_mesh.scale.y = model_scale;
     smooth_mesh.scale.z = model_scale;
@@ -274,6 +277,7 @@ function addCtrlPtMeshes() {
     let ctrl_pt_mesh = new THREE.Mesh(ctrl_pt_geom, ctrl_pt_material);
     ctrl_pt_mesh.position.copy(ffd.getPosition(i));
     ctrl_pt_mesh.material.ambient = ctrl_pt_mesh.material.color;
+    ctrl_pt_mesh.name = "ctrl_pt_mesh" + i;
     ctrl_pt_meshes.push(ctrl_pt_mesh);
     group.add(ctrl_pt_mesh);
   }
