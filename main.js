@@ -17,7 +17,7 @@ let smooth_verts_undeformed = [];
 // FFD: control points of a lattice
 let ffd = new FFD();
 let span_counts = [2, 2, 2];
-let ctrl_pt_geom = new THREE.SphereGeometry(2.5, 32, 32);
+let ctrl_pt_geom = new THREE.SphereGeometry(5, 32, 32);
 let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0xfff000 });
 let ctrl_pt_meshes = [];
 let ctrl_pt_mesh_selected = null;
@@ -131,16 +131,7 @@ function onDocumentMouseMove(event) {
   }
 }
 
-function onDocumentMouseDown(event) {
-  event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  let intersects = raycaster.intersectObjects(objects, true);
-  if (intersects.length > 0) {
-    selected_model = intersects[0].object.parent;
-    build(selected_model);
-  }
+function onDocumentMouseDown() {
   let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
   if (
     clicked_ctrl_point.length > 0 &&
@@ -162,6 +153,19 @@ function keyDown(event) {
     removeLatticeLines();
     trfm_ctrl.detach(trfm_ctrl.object);
     selected_model = null;
+  }
+  // x
+  if (event.keyCode == 88) {
+    event.preventDefault();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    raycaster.setFromCamera(mouse, camera);
+    let intersects = raycaster.intersectObjects(objects, true);
+    if (selected_model) {
+    }
+    if (intersects.length > 0 && intersects[0].object != selected_model) {
+      selected_model = intersects[0].object.parent;
+      build(selected_model);
+    }
   }
 }
 
@@ -211,12 +215,11 @@ function addModels() {
         smooth_materials
       );
       if (i == 0) {
-        smooth_mesh.position.set(0, 100, 0);
+        smooth_mesh.position.set(0, 0, 0);
       } else {
-        smooth_mesh.position.set(0, 65, 75);
+        smooth_mesh.position.set(0, -45, 80);
       }
       smooth_mesh.name = "model";
-      // exporter_grp.add(smooth_mesh);
       objects.push(smooth_mesh);
       group.add(smooth_mesh);
     });
@@ -238,7 +241,7 @@ function rebuildFFD(model) {
   removeLatticeLines();
   let bbox;
   bbox = new THREE.Box3();
-  bbox.setFromPoints(model.children[0].geometry.vertices);
+  bbox.setFromPoints(model.children[1].geometry.vertices);
   let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
   ffd.rebuildLattice(bbox, span_counts_copy);
   addCtrlPtMeshes();
