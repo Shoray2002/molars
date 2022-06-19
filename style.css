@@ -22,7 +22,7 @@ body {
 }
 
 .button {
-  background-color: #00000041;
+  background-color: #ffffff41;
   border: none;
   color: white;
   padding: 7px 16px;
@@ -36,7 +36,8 @@ body {
 }
 
 .button:hover {
-  background-color: #000000;
+  background-color: #ffffff;
+  color: black;
   border-radius: 5px;
 }
 

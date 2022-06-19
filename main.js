@@ -28,7 +28,8 @@ let lattice_line_material = new THREE.LineBasicMaterial({
   opacity: 0.5,
 });
 const objects = [];
-const exportButton = document.getElementById("export");
+const exportButton = document.getElementById("exportSTL");
+const exportSelect = document.getElementById("exportSelect");
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 const loaderObj = new THREE.OBJLoader();
 let exporter = new THREE.STLExporter();
@@ -94,6 +95,21 @@ function init() {
     a.href = URL.createObjectURL(blob);
     a.download = "mesh.stl";
     a.click();
+  });
+  exportSelect.addEventListener("click", function () {
+    if (selected_model) {
+      removeCtrlPtMeshes();
+      removeLatticeLines();
+      trfm_ctrl.detach(trfm_ctrl.object);
+      let stl = exporter.parse(selected_model);
+      let blob = new Blob([stl], { type: "text/plain" });
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "object.stl";
+      a.click();
+    } else {
+      alert("Please select an object first");
+    }
   });
 }
 
