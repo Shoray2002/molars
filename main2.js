@@ -57,6 +57,8 @@ function init() {
 
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
+  window.addEventListener("mousedown", onDocumentMouseDown);
+
   addModels();
 
   exportButton.addEventListener("click", function () {
@@ -77,6 +79,21 @@ function onDocumentMouseMove(event) {
   let intersects = raycaster.intersectObjects(objects, true);
   if (intersects.length > 0) {
     console.log(intersects[0].object.uuid);
+    renderer.domElement.style.cursor = "pointer";
+  } else {
+    renderer.domElement.style.cursor = "auto";
+  }
+}
+
+function onDocumentMouseDown(event) {
+  event.preventDefault();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  let intersects = raycaster.intersectObjects(objects, true);
+  if (intersects.length > 0) {
+    console.log(intersects[0].object.uuid);
+    trfm_ctrl.attach(intersects[0].object.parent);
     renderer.domElement.style.cursor = "pointer";
   } else {
     renderer.domElement.style.cursor = "auto";
