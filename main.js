@@ -44,14 +44,12 @@ function init() {
     1,
     100000
   );
-  camera.position.set(0, 0, 800);
-  camera.lookAt(0, 0, 0);
+  camera.position.set(0, -100, 800);
+  camera.lookAt(0, -100, 0);
   scene = new THREE.Scene();
   group = new THREE.Group();
   group.rotation.x = Math.PI / 3;
   scene.add(group);
-  // exporter_grp = new THREE.Group();
-  // scene.add(exporter_grp);
   // lights
   let light = new THREE.PointLight(0x6c6b6b, 1.5);
   light.position.set(1000, 1000, 2000);
@@ -168,23 +166,24 @@ function keyDown(event) {
     }
   }
 }
-
-function build(model) {
-  smooth_verts_undeformed.length = 0;
-  for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
-    let copy_vertex = new THREE.Vector3();
-    copy_vertex.copy(model.children[0].geometry.vertices[i]);
-    smooth_verts_undeformed.push(copy_vertex);
-  }
-  rebuildFFD(model);
-}
-
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
 }
+function build(model) {
+  smooth_verts_undeformed.length = 0;
+  for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
+    let copy_vertex = new THREE.Vector3();
+    copy_vertex.copy(
+      model.children[0].geometry.vertices[i]
+    );
+    smooth_verts_undeformed.push(copy_vertex);
+  }
+  rebuildFFD(model);
+}
+
 function addModels() {
   smooth_materials = [
     new THREE.MeshPhongMaterial({
@@ -218,6 +217,7 @@ function addModels() {
         smooth_mesh.position.set(0, 0, 0);
       } else {
         smooth_mesh.position.set(0, -45, 80);
+        // smooth_mesh.position.set(0, 0, 0);
       }
       smooth_mesh.name = "model";
       objects.push(smooth_mesh);
@@ -241,7 +241,17 @@ function rebuildFFD(model) {
   removeLatticeLines();
   let bbox;
   bbox = new THREE.Box3();
-  bbox.setFromPoints(model.children[1].geometry.vertices);
+  let modified_verts = [];
+  for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
+    let copy_vertex = new THREE.Vector3();
+    copy_vertex.copy(
+      model.children[0].geometry.vertices[i].add(model.position)
+    );
+    modified_verts.push(copy_vertex);
+  }
+
+  bbox.setFromPoints(modified_verts);
+  console.log(model.children[0].geometry.vertices);
   let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
   ffd.rebuildLattice(bbox, span_counts_copy);
   addCtrlPtMeshes();
