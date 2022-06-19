@@ -14,7 +14,6 @@ let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
 let subd_level = 0;
 let smooth_verts_undeformed = [];
-// FFD: control points of a lattice
 let ffd = new FFD();
 let span_counts = [2, 2, 2];
 let ctrl_pt_geom = new THREE.SphereGeometry(5, 32, 32);
