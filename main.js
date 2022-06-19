@@ -1,7 +1,6 @@
 let camera,
   scene,
   renderer,
-  user_options,
   orbit_ctrl,
   trfm_ctrl,
   orig_geom,
