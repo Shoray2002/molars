@@ -7,11 +7,26 @@ let camera,
   smooth_geom,
   smooth_materials,
   smooth_mesh,
-  temp_mesh,
-  group;
+  exporter_grp,
+  group,
+  selected_model;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
-
+let subd_level = 0;
+let smooth_verts_undeformed = [];
+// FFD: control points of a lattice
+let ffd = new FFD();
+let span_counts = [2, 2, 2];
+let ctrl_pt_geom = new THREE.SphereGeometry(2.5, 32, 32);
+let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0xfff000 });
+let ctrl_pt_meshes = [];
+let ctrl_pt_mesh_selected = null;
+let lattice_lines = [];
+let lattice_line_material = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+  transparent: true,
+  opacity: 0.5,
+});
 const objects = [];
 const exportButton = document.getElementById("export");
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
@@ -28,12 +43,14 @@ function init() {
     1,
     100000
   );
-  camera.position.set(0, 0, 650);
+  camera.position.set(0, 0, 800);
   camera.lookAt(0, 0, 0);
   scene = new THREE.Scene();
   group = new THREE.Group();
   group.rotation.x = Math.PI / 3;
   scene.add(group);
+  // exporter_grp = new THREE.Group();
+  // scene.add(exporter_grp);
   // lights
   let light = new THREE.PointLight(0x6c6b6b, 1.5);
   light.position.set(1000, 1000, 2000);
@@ -54,14 +71,23 @@ function init() {
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
   trfm_ctrl.addEventListener("change", render);
   scene.add(trfm_ctrl);
+  trfm_ctrl.addEventListener("objectChange", function (e) {
+    updateLattice();
+    deform();
+  });
 
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
+  window.addEventListener("keydown", keyDown, false);
 
   addModels();
 
   exportButton.addEventListener("click", function () {
+    removeCtrlPtMeshes();
+    removeLatticeLines();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = null;
     let stl = exporter.parse(group);
     let blob = new Blob([stl], { type: "text/plain" });
     let a = document.createElement("a");
@@ -77,8 +103,12 @@ function onDocumentMouseMove(event) {
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
   let intersects = raycaster.intersectObjects(objects, true);
-  if (intersects.length > 0) {
-    console.log(intersects[0].object.uuid);
+  let hovered_ctrl_points = raycaster.intersectObjects(ctrl_pt_meshes);
+  if (
+    intersects.length > 0 ||
+    (hovered_ctrl_points.length > 0 &&
+      ctrl_pt_mesh_selected != hovered_ctrl_points[0].object)
+  ) {
     renderer.domElement.style.cursor = "pointer";
   } else {
     renderer.domElement.style.cursor = "auto";
@@ -92,12 +122,41 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   let intersects = raycaster.intersectObjects(objects, true);
   if (intersects.length > 0) {
-    console.log(intersects[0].object.uuid);
-    trfm_ctrl.attach(intersects[0].object.parent);
-    renderer.domElement.style.cursor = "pointer";
-  } else {
-    renderer.domElement.style.cursor = "auto";
+    selected_model = intersects[0].object.parent;
+    build(selected_model);
   }
+  let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
+  if (
+    clicked_ctrl_point.length > 0 &&
+    ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
+  ) {
+    orbit_ctrl.enabled = false;
+    console.log(clicked_ctrl_point[0].object.name);
+    if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
+    ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
+    trfm_ctrl.attach(ctrl_pt_mesh_selected);
+  } else {
+    orbit_ctrl.enabled = true;
+  }
+}
+function keyDown(event) {
+  // esc
+  if (event.keyCode == 27) {
+    removeCtrlPtMeshes();
+    removeLatticeLines();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = null;
+  }
+}
+
+function build(model) {
+  smooth_verts_undeformed.length = 0;
+  for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
+    let copy_vertex = new THREE.Vector3();
+    copy_vertex.copy(model.children[0].geometry.vertices[i]);
+    smooth_verts_undeformed.push(copy_vertex);
+  }
+  rebuildFFD(model);
 }
 
 function onWindowResize() {
@@ -140,14 +199,8 @@ function addModels() {
       } else {
         smooth_mesh.position.set(0, 65, 75);
       }
-      //   temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials);
-      //   temp_mesh.position.set(
-      //     smooth_mesh.position.x,
-      //     smooth_mesh.position.y,
-      //     smooth_mesh.position.z
-      //   );
-      smooth_mesh.name = model_names[i];
-      //   temp_mesh.name = model_names[i];
+      smooth_mesh.name = "model";
+      // exporter_grp.add(smooth_mesh);
       objects.push(smooth_mesh);
       group.add(smooth_mesh);
     });
@@ -162,4 +215,142 @@ function animate() {
   orbit_ctrl.update();
   trfm_ctrl.update();
   render();
+}
+
+function rebuildFFD(model) {
+  removeCtrlPtMeshes();
+  removeLatticeLines();
+  let bbox;
+  bbox = new THREE.Box3();
+  bbox.setFromPoints(model.children[0].geometry.vertices);
+  let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
+  ffd.rebuildLattice(bbox, span_counts_copy);
+  addCtrlPtMeshes();
+  addLatticeLines();
+  deform();
+}
+
+function removeCtrlPtMeshes() {
+  for (let i = 0; i < ctrl_pt_meshes.length; i++)
+    group.remove(ctrl_pt_meshes[i]);
+  ctrl_pt_meshes.length = 0;
+}
+
+function removeLatticeLines() {
+  for (let i = 0; i < lattice_lines.length; i++) group.remove(lattice_lines[i]);
+  lattice_lines.length = 0;
+}
+
+function addCtrlPtMeshes() {
+  for (let i = 0; i < ffd.getTotalCtrlPtCount(); i++) {
+    let ctrl_pt_mesh = new THREE.Mesh(ctrl_pt_geom, ctrl_pt_material);
+    ctrl_pt_mesh.position.copy(ffd.getPosition(i));
+    ctrl_pt_mesh.material.ambient = ctrl_pt_mesh.material.color;
+    ctrl_pt_mesh.name = "ctrl_pt_mesh" + i;
+    ctrl_pt_meshes.push(ctrl_pt_mesh);
+    group.add(ctrl_pt_mesh);
+  }
+}
+
+function addLatticeLines() {
+  for (let i = 0; i < ffd.getCtrlPtCount(0) - 1; i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1); j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2); k++) {
+        let geometry = new THREE.Geometry();
+        geometry.vertices.push(ctrl_pt_meshes[ffd.getIndex(i, j, k)].position);
+        geometry.vertices.push(
+          ctrl_pt_meshes[ffd.getIndex(i + 1, j, k)].position
+        );
+        let line = new THREE.Line(geometry, lattice_line_material);
+
+        lattice_lines.push(line);
+        group.add(line);
+      }
+    }
+  }
+  for (let i = 0; i < ffd.getCtrlPtCount(0); i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1) - 1; j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2); k++) {
+        let geometry = new THREE.Geometry();
+        geometry.vertices.push(ctrl_pt_meshes[ffd.getIndex(i, j, k)].position);
+        geometry.vertices.push(
+          ctrl_pt_meshes[ffd.getIndex(i, j + 1, k)].position
+        );
+        let line = new THREE.Line(geometry, lattice_line_material);
+        lattice_lines.push(line);
+        group.add(line);
+      }
+    }
+  }
+  for (let i = 0; i < ffd.getCtrlPtCount(0); i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1); j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2) - 1; k++) {
+        let geometry = new THREE.Geometry();
+        geometry.vertices.push(ctrl_pt_meshes[ffd.getIndex(i, j, k)].position);
+        geometry.vertices.push(
+          ctrl_pt_meshes[ffd.getIndex(i, j, k + 1)].position
+        );
+        let line = new THREE.Line(geometry, lattice_line_material);
+
+        lattice_lines.push(line);
+        group.add(line);
+      }
+    }
+  }
+}
+
+function updateLattice() {
+  for (let i = 0; i < ffd.getTotalCtrlPtCount(); i++)
+    ffd.setPosition(i, ctrl_pt_meshes[i].position);
+  let line_index = 0;
+  for (let i = 0; i < ffd.getCtrlPtCount(0) - 1; i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1); j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2); k++) {
+        let line = lattice_lines[line_index++];
+        line.geometry.vertices[0] =
+          ctrl_pt_meshes[ffd.getIndex(i, j, k)].position;
+        line.geometry.vertices[1] =
+          ctrl_pt_meshes[ffd.getIndex(i + 1, j, k)].position;
+        line.geometry.verticesNeedUpdate = true;
+      }
+    }
+  }
+  for (let i = 0; i < ffd.getCtrlPtCount(0); i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1) - 1; j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2); k++) {
+        let line = lattice_lines[line_index++];
+        line.geometry.vertices[0] =
+          ctrl_pt_meshes[ffd.getIndex(i, j, k)].position;
+        line.geometry.vertices[1] =
+          ctrl_pt_meshes[ffd.getIndex(i, j + 1, k)].position;
+        line.geometry.verticesNeedUpdate = true;
+      }
+    }
+  }
+  for (let i = 0; i < ffd.getCtrlPtCount(0); i++) {
+    for (let j = 0; j < ffd.getCtrlPtCount(1); j++) {
+      for (let k = 0; k < ffd.getCtrlPtCount(2) - 1; k++) {
+        let line = lattice_lines[line_index++];
+        line.geometry.vertices[0] =
+          ctrl_pt_meshes[ffd.getIndex(i, j, k)].position;
+        line.geometry.vertices[1] =
+          ctrl_pt_meshes[ffd.getIndex(i, j, k + 1)].position;
+        line.geometry.verticesNeedUpdate = true;
+      }
+    }
+  }
+}
+
+function deform() {
+  for (
+    let i = 0;
+    i < selected_model.children[0].geometry.vertices.length;
+    i++
+  ) {
+    let eval_pt = ffd.evalWorld(smooth_verts_undeformed[i]);
+    if (eval_pt.equals(selected_model.children[0].geometry.vertices[i]))
+      continue;
+    selected_model.children[0].geometry.vertices[i].copy(eval_pt);
+  }
+  selected_model.children[0].geometry.verticesNeedUpdate = true;
 }

@@ -15,7 +15,7 @@ let smooth_mesh;
 let smooth_verts_undeformed = [];
 let model_scale;
 let model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
-// FFD: control points of a lattice
+
 let ffd = new FFD();
 let span_counts = [2, 2, 3];
 let ctrl_pt_geom = new THREE.SphereGeometry(2.5, 32, 32);
