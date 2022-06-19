@@ -7,13 +7,18 @@ let camera,
   smooth_geom,
   smooth_materials,
   smooth_mesh,
+  temp_mesh,
   group;
+let mouse = new THREE.Vector2();
+let raycaster = new THREE.Raycaster();
 
+const objects = [];
 const exportButton = document.getElementById("export");
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 const loaderObj = new THREE.OBJLoader();
 let exporter = new THREE.STLExporter();
 init();
+console.log(objects);
 animate();
 
 function init() {
@@ -49,13 +54,9 @@ function init() {
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
   trfm_ctrl.addEventListener("change", render);
   scene.add(trfm_ctrl);
-  //   trfm_ctrl.addEventListener("objectChange", function (e) {
-  //     updateLattice();
-  //     deform();
-  //   });
 
   window.addEventListener("resize", onWindowResize);
-
+  window.addEventListener("mousemove", onDocumentMouseMove);
   addModels();
 
   exportButton.addEventListener("click", function () {
@@ -66,6 +67,20 @@ function init() {
     a.download = "mesh.stl";
     a.click();
   });
+}
+
+function onDocumentMouseMove(event) {
+  event.preventDefault();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  let intersects = raycaster.intersectObjects(objects, true);
+  if (intersects.length > 0) {
+    console.log(intersects[0].object.uuid);
+    renderer.domElement.style.cursor = "pointer";
+  } else {
+    renderer.domElement.style.cursor = "auto";
+  }
 }
 
 function onWindowResize() {
@@ -108,8 +123,15 @@ function addModels() {
       } else {
         smooth_mesh.position.set(0, 65, 75);
       }
+      //   temp_mesh = new THREE.Mesh(smooth_geom, smooth_materials);
+      //   temp_mesh.position.set(
+      //     smooth_mesh.position.x,
+      //     smooth_mesh.position.y,
+      //     smooth_mesh.position.z
+      //   );
       smooth_mesh.name = model_names[i];
-      console.log(smooth_mesh);
+      //   temp_mesh.name = model_names[i];
+      objects.push(smooth_mesh);
       group.add(smooth_mesh);
     });
   }
@@ -119,6 +141,7 @@ function render() {
 }
 function animate() {
   requestAnimationFrame(animate);
+  raycaster.setFromCamera(mouse, camera);
   orbit_ctrl.update();
   trfm_ctrl.update();
   render();
