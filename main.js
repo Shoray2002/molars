@@ -6,6 +6,7 @@ let camera,
   orig_geom,
   smooth_geom,
   smooth_materials,
+  jaw_material,
   smooth_mesh,
   exporter_grp,
   group,
@@ -196,6 +197,12 @@ function addModels() {
       transparent: true,
     }),
   ];
+  jaw_material = new THREE.MeshPhongMaterial({
+    color: 0x00ffff,
+    specular: 0xe5e5e5,
+    shininess: 1,
+    side: THREE.DoubleSide,
+  });
   for (let i = 0; i < model_names.length; i++) {
     loaderObj.load("./models/" + model_names[i] + ".obj", function (object) {
       let subd_modifier = new THREE.SubdivisionModifier(0);
@@ -206,10 +213,12 @@ function addModels() {
       smooth_geom.computeFaceNormals();
       smooth_geom.computeVertexNormals();
       subd_modifier.modify(smooth_geom);
-      smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
-        smooth_geom,
-        smooth_materials
-      );
+      if (i == 0) {
+        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, [
+          jaw_material,
+          smooth_materials[1],
+        ]);
+      } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials);
       if (i == 0) {
         smooth_mesh.position.set(0, 0, 0);
       } else {
