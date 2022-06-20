@@ -175,9 +175,7 @@ function build(model) {
   smooth_verts_undeformed.length = 0;
   for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
     let copy_vertex = new THREE.Vector3();
-    copy_vertex.copy(
-      model.children[0].geometry.vertices[i]
-    );
+    copy_vertex.copy(model.children[0].geometry.vertices[i]);
     smooth_verts_undeformed.push(copy_vertex);
   }
   rebuildFFD(model);
@@ -215,8 +213,7 @@ function addModels() {
       if (i == 0) {
         smooth_mesh.position.set(0, 0, 0);
       } else {
-        smooth_mesh.position.set(0, -45, 80);
-        // smooth_mesh.position.set(0, 0, 0);
+        smooth_mesh.position.set(0, 0, 0);
       }
       smooth_mesh.name = "model";
       objects.push(smooth_mesh);
