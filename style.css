@@ -121,12 +121,15 @@ canvas {
 }
 
 #link {
-  width: 100%;
   border-radius: 5px;
   color: rgb(0, 0, 0);
   outline: none;
   padding: 1vh 2vh;
   margin-bottom: 1vh;
+}
+
+input[type="file"] {
+  opacity: 0;
 }
 
 .area {

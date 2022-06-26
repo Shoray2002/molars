@@ -1,3 +1,4 @@
+// variables
 let camera,
   scene,
   renderer,
@@ -29,16 +30,25 @@ let lattice_line_material = new THREE.LineBasicMaterial({
 });
 let export_model_name = "";
 const objects = [];
-const exportButton = document.getElementById("exportSTL");
-const exportSelect = document.getElementById("exportSelect");
-const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 const loaderObj = new THREE.OBJLoader();
 // const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
-init();
-console.log(objects);
-animate();
+const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 
+// document selection
+const exportButton = document.getElementById("exportSTL");
+const exportSelect = document.getElementById("exportSelect");
+const import_modal_button = document.getElementById("import-modal");
+const close = document.getElementById("close");
+const modal = document.querySelector(".modal");
+const uploadFile_button = document.getElementById("uploadFile");
+const uploadLink_button = document.getElementById("uploadLink");
+const holder = document.getElementById("holder");
+
+// function calls
+init();
+animate();
+// main function
 function init() {
   camera = new THREE.PerspectiveCamera(
     45,
@@ -83,7 +93,6 @@ function init() {
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
   addModels();
-
   exportButton.addEventListener("click", function () {
     export_model_namer();
     removeCtrlPtMeshes();
@@ -114,9 +123,68 @@ function init() {
     }
   });
 }
-function export_model_namer() {
-  export_model_name = prompt("Enter model name");
-}
+
+// event listeners
+import_modal_button.addEventListener("click", function () {
+  modal.style.display = "flex";
+});
+close.addEventListener("click", function () {
+  modal.style.display = "none";
+  holder.innerHTML = "";
+});
+uploadFile_button.addEventListener("click", function () {
+  holder.innerHTML =
+    '<label class="area" for="upload"><input type="file" id="upload" /><label>  ';
+  let upload = document.getElementById("upload");
+  function onFile() {
+    let file = upload.files[0];
+    let name = file.name;
+    console.log("upload code goes here", name);
+  }
+  upload.addEventListener(
+    "dragenter",
+    function (e) {
+      upload.parentNode.className = "area dragging";
+      console.log("dragenter");
+    },
+    false
+  );
+  upload.addEventListener(
+    "dragleave",
+    function (e) {
+      upload.parentNode.className = "area";
+      console.log("dragleave");
+    },
+    false
+  );
+  upload.addEventListener(
+    "dragdrop",
+    function (e) {
+      onFile();
+      console.log("dragdrop");
+    },
+    false
+  );
+  upload.addEventListener(
+    "change",
+    function (e) {
+      onFile();
+    },
+    false
+  );
+});
+uploadLink_button.addEventListener("click", function () {
+  holder.innerHTML =
+    '<input type="text" id="link" name="link" placeholder="Paste link here" autocomplete="off"/><button class="button" id="load-model-from-url">Submit</button>';
+  const submit_link = document.getElementById("load-model-from-url");
+  submit_link.addEventListener("click", function () {
+    const link = document.getElementById("link").value;
+    console.log(link);
+    close.click();
+  });
+});
+
+// event handlers
 function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -134,7 +202,6 @@ function onDocumentMouseMove(event) {
     renderer.domElement.style.cursor = "auto";
   }
 }
-
 function onDocumentMouseDown() {
   let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
   if (
@@ -178,6 +245,14 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
 }
+
+// helper functions
+function export_model_namer() {
+  export_model_name = prompt("Enter model name");
+  if (export_model_name == "") {
+    export_model_name = "model";
+  }
+}
 function build(model) {
   smooth_verts_undeformed.length = 0;
   for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
@@ -187,7 +262,6 @@ function build(model) {
   }
   rebuildFFD(model);
 }
-
 function addModels() {
   smooth_materials = [
     new THREE.MeshPhongMaterial({
@@ -246,7 +320,6 @@ function animate() {
   trfm_ctrl.update();
   render();
 }
-
 function rebuildFFD(model) {
   removeCtrlPtMeshes();
   removeLatticeLines();
@@ -269,18 +342,15 @@ function rebuildFFD(model) {
   addLatticeLines();
   deform();
 }
-
 function removeCtrlPtMeshes() {
   for (let i = 0; i < ctrl_pt_meshes.length; i++)
     group.remove(ctrl_pt_meshes[i]);
   ctrl_pt_meshes.length = 0;
 }
-
 function removeLatticeLines() {
   for (let i = 0; i < lattice_lines.length; i++) group.remove(lattice_lines[i]);
   lattice_lines.length = 0;
 }
-
 function addCtrlPtMeshes() {
   for (let i = 0; i < ffd.getTotalCtrlPtCount(); i++) {
     let ctrl_pt_mesh = new THREE.Mesh(ctrl_pt_geom, ctrl_pt_material);
@@ -291,7 +361,6 @@ function addCtrlPtMeshes() {
     group.add(ctrl_pt_mesh);
   }
 }
-
 function addLatticeLines() {
   for (let i = 0; i < ffd.getCtrlPtCount(0) - 1; i++) {
     for (let j = 0; j < ffd.getCtrlPtCount(1); j++) {
@@ -338,7 +407,6 @@ function addLatticeLines() {
     }
   }
 }
-
 function updateLattice() {
   for (let i = 0; i < ffd.getTotalCtrlPtCount(); i++)
     ffd.setPosition(i, ctrl_pt_meshes[i].position);
@@ -380,7 +448,6 @@ function updateLattice() {
     }
   }
 }
-
 function deform() {
   for (
     let i = 0;
