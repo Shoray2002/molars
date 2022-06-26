@@ -27,6 +27,7 @@ let lattice_line_material = new THREE.LineBasicMaterial({
   transparent: true,
   opacity: 0.5,
 });
+let export_model_name = "";
 const objects = [];
 const exportButton = document.getElementById("exportSTL");
 const exportSelect = document.getElementById("exportSelect");
@@ -83,6 +84,7 @@ function init() {
   addModels();
 
   exportButton.addEventListener("click", function () {
+    export_model_namer();
     removeCtrlPtMeshes();
     removeLatticeLines();
     trfm_ctrl.detach(trfm_ctrl.object);
@@ -91,11 +93,12 @@ function init() {
     let blob = new Blob([stl], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "mesh.stl";
+    a.download = export_model_name + ".stl";
     a.click();
   });
   exportSelect.addEventListener("click", function () {
     if (selected_model) {
+      export_model_namer();
       removeCtrlPtMeshes();
       removeLatticeLines();
       trfm_ctrl.detach(trfm_ctrl.object);
@@ -103,14 +106,16 @@ function init() {
       let blob = new Blob([stl], { type: "text/plain" });
       let a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "object.stl";
+      a.download = export_model_name + ".stl";
       a.click();
     } else {
       alert("Please select an object first");
     }
   });
 }
-
+function export_model_namer() {
+  export_model_name = prompt("Enter model name");
+}
 function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
