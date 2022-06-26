@@ -28,7 +28,6 @@ let lattice_line_material = new THREE.LineBasicMaterial({
   transparent: true,
   opacity: 0.5,
 });
-let export_model_name = "";
 const objects = [];
 const loaderObj = new THREE.OBJLoader();
 // const loaderSTL = new THREE.STLLoader();
@@ -94,7 +93,6 @@ function init() {
   window.addEventListener("keydown", keyDown, false);
   addModels();
   exportButton.addEventListener("click", function () {
-    export_model_namer();
     removeCtrlPtMeshes();
     removeLatticeLines();
     trfm_ctrl.detach(trfm_ctrl.object);
@@ -103,12 +101,11 @@ function init() {
     let blob = new Blob([stl], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = export_model_name + ".stl";
+    a.download = export_model_namer() + ".stl";
     a.click();
   });
   exportSelect.addEventListener("click", function () {
     if (selected_model) {
-      export_model_namer();
       removeCtrlPtMeshes();
       removeLatticeLines();
       trfm_ctrl.detach(trfm_ctrl.object);
@@ -116,7 +113,7 @@ function init() {
       let blob = new Blob([stl], { type: "text/plain" });
       let a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = export_model_name + ".stl";
+      a.download = export_model_namer() + ".stl";
       a.click();
     } else {
       alert("Please select an object first");
@@ -248,10 +245,11 @@ function onWindowResize() {
 
 // helper functions
 function export_model_namer() {
-  export_model_name = prompt("Enter model name");
-  if (export_model_name == "") {
+  let export_model_name = prompt("Enter model name");
+  if (!export_model_name) {
     export_model_name = "model";
   }
+  return export_model_name;
 }
 function build(model) {
   smooth_verts_undeformed.length = 0;
