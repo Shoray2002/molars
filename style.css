@@ -13,17 +13,26 @@ body {
 
 .upper {
   top: 2vh;
-  right: 0;
-  padding: 5px;
+  right: 2%;
+  width: 95%;
+}
+
+.centerised {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.distribution {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .interactives {
   position: absolute;
   z-index: 1;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -31,7 +40,7 @@ body {
 }
 
 .button {
-  background-color: #ffffff41;
+  background-color: #89898941;
   border: none;
   color: white;
   padding: 7px 16px;
@@ -41,7 +50,7 @@ body {
   font-size: 20px;
   margin: 4px 2px;
   cursor: pointer;
-  transition: cubic-bezier(0.2, 0.8, 0.2, 1) 1s;
+  transition: all cubic-bezier(0.2, 0.8, 0.2, 1) 1s;
 }
 
 .button:hover {
@@ -129,7 +138,6 @@ canvas {
 }
 
 .selection {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -177,10 +177,14 @@ function onDocumentMouseDown() {
 function keyDown(event) {
   // esc
   if (event.keyCode == 27) {
-    removeCtrlPtMeshes();
-    removeLatticeLines();
-    trfm_ctrl.detach(trfm_ctrl.object);
-    selected_model = null;
+    if (modal.style.display == "flex") {
+      close.click();
+    } else {
+      removeCtrlPtMeshes();
+      removeLatticeLines();
+      trfm_ctrl.detach(trfm_ctrl.object);
+      selected_model = null;
+    }
   }
   // x
   if (event.keyCode == 88) {
