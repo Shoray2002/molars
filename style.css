@@ -59,7 +59,7 @@ canvas {
   display: none;
   justify-content: center;
   align-items: center;
-  transition: cubic-bezier(0.075, 0.82, 0.165, 1) 1s;
+  transition: all ease-in-out 0.5s;
 }
 
 .modal-content {
@@ -114,9 +114,10 @@ canvas {
   padding: 1vh;
   color: white;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  width: 100%;
 }
 
 #link {
@@ -126,4 +127,56 @@ canvas {
   outline: none;
   padding: 1vh 2vh;
   margin-bottom: 1vh;
+}
+
+.area {
+  height: 45vh;
+  width: 100%;
+  border: #fff 3px dashed;
+  background-image: url("./image.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 64px 64px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+  text-align: center;
+  animation: fade 1.5s ease-in-out infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fade {
+
+  0%,
+  100% {
+    opacity: 0.5
+  }
+
+  50% {
+    opacity: 1
+  }
+}
+
+.area:hover,
+.area.dragging,
+.area.uploading {
+  animation: none;
+  cursor: pointer;
+}
+
+.area input {
+  width: 400%;
+  height: 100%;
+  /* margin-left: -300%; */
+  border: none;
+  cursor: pointer;
+}
+
+.area input:focus {
+  outline: none;
 }

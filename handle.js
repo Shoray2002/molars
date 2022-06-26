@@ -18,8 +18,48 @@ window.addEventListener("keydown", function (event) {
 });
 
 uploadFile_button.addEventListener("click", function () {
-  holder.innerHTML =
-    '<input type="file" id="file" name="file" accept=".json" />';
+  holder.innerHTML = '<div class="area"><input type="file" id="upload" /><div>';
+  let upload = document.getElementById("upload");
+  function onFile() {
+    let file = upload.files[0];
+    let name = file.name;
+    console.log("upload code goes here", name);
+  }
+
+  upload.addEventListener(
+    "dragenter",
+    function (e) {
+      upload.parentNode.className = "area dragging";
+      console.log("dragenter");
+    },
+    false
+  );
+
+  upload.addEventListener(
+    "dragleave",
+    function (e) {
+      upload.parentNode.className = "area";
+      console.log("dragleave");
+    },
+    false
+  );
+
+  upload.addEventListener(
+    "dragdrop",
+    function (e) {
+      onFile();
+      console.log("dragdrop");
+    },
+    false
+  );
+
+  upload.addEventListener(
+    "change",
+    function (e) {
+      onFile();
+    },
+    false
+  );
 });
 
 uploadLink_button.addEventListener("click", function () {
