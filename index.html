@@ -9,7 +9,17 @@
 <link rel="stylesheet" href="./style.css" />
 
 <body>
-  <div class="interactives">
+  <div class="upper interactives">
+    <div class="selection">
+      <label id="span_count-label" for="span-dropdown">Control Point Multiplier : </label>
+      <select name="span_dropdown" id="span-dropdown">
+        <option value="1">2</option>
+        <option value="2" selected>3</option>
+        <option value="3">4</option>
+      </select>
+    </div>
+  </div>
+  <div class="lower interactives">
     <div class="buttons">
       <div id="import-modal" class="button">Import Model</div>
       <div id="exportSTL" class="button">Export Whole Model</div>
@@ -18,12 +28,12 @@
     <div class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Import Model</h2>
+          <h2>Import Model Via Link</h2>
           <span id="close">&times;</span>
         </div>
         <div class="modal-body">
-          <div id="uploadFile" class="button">Import Model from Storage</div>
-          <div id="uploadLink" class="button">Import Model from Link</div>
+          <input type="text" id="link" name="link" placeholder="Paste link here" autocomplete="off" /><button
+            class="button" id="load-model-from-url">Submit</button>
         </div>
         <div id="holder"></div>
       </div>

@@ -5,11 +5,20 @@ body {
   overflow: hidden;
 }
 
-.interactives {
-  position: absolute;
+.lower {
   bottom: 2vh;
   left: 0;
   width: 100%;
+}
+
+.upper {
+  top: 2vh;
+  right: 0;
+  padding: 5px;
+}
+
+.interactives {
+  position: absolute;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -91,11 +100,11 @@ canvas {
 .modal-body {
   padding: 2vh 0;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  flex-direction: column;
   align-items: center;
   width: 100%;
   height: 90%;
-  border-bottom: rgba(245, 245, 245, 0.511) 1px solid;
 }
 
 #close {
@@ -110,17 +119,8 @@ canvas {
   cursor: pointer;
 }
 
-#holder {
-  padding: 1vh;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
 #link {
+  width: 80%;
   border-radius: 5px;
   color: rgb(0, 0, 0);
   outline: none;
@@ -128,58 +128,26 @@ canvas {
   margin-bottom: 1vh;
 }
 
-input[type="file"] {
-  opacity: 0;
-}
-
-.area {
-  height: 45vh;
+.selection {
   width: 100%;
-  border: #fff 3px dashed;
-  background-image: url("./image.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 64px 64px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -khtml-opacity: 1;
-  -moz-opacity: 1;
-  opacity: 1;
-  text-align: center;
-  animation: fade 1.5s ease-in-out infinite;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-@keyframes fade {
-
-  0%,
-  100% {
-    opacity: 0.5
-  }
-
-  50% {
-    opacity: 1
-  }
-}
-
-.area:hover,
-.area.dragging,
-.area.uploading {
-  animation: none;
+  flex-direction: row;
+  color: #fff;
   cursor: pointer;
+  font-size: 1rem;
 }
 
-.area input {
-  width: 400%;
-  height: 100%;
-  /* margin-left: -300%; */
-  border: none;
-  cursor: pointer;
-}
-
-.area input:focus {
+#span-dropdown {
+  background: transparent;
+  color: #fff;
+  padding: 0 2vh 0 3vh;
+  margin-left: 10px;
   outline: none;
+  font-size: 1rem;
+}
+
+option {
+  color: black;
 }

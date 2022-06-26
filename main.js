@@ -18,8 +18,8 @@ let subd_level = 0;
 let smooth_verts_undeformed = [];
 let ffd = new FFD();
 let span_counts = [2, 2, 2];
-let ctrl_pt_geom = new THREE.SphereGeometry(5, 32, 32);
-let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0xfff000 });
+let ctrl_pt_geom = new THREE.SphereGeometry(4, 32, 32);
+let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 let ctrl_pt_meshes = [];
 let ctrl_pt_mesh_selected = null;
 let lattice_lines = [];
@@ -40,10 +40,9 @@ const exportSelect = document.getElementById("exportSelect");
 const import_modal_button = document.getElementById("import-modal");
 const close = document.getElementById("close");
 const modal = document.querySelector(".modal");
-const uploadFile_button = document.getElementById("uploadFile");
 const uploadLink_button = document.getElementById("uploadLink");
-const holder = document.getElementById("holder");
-
+const submit_link = document.getElementById("load-model-from-url");
+const span_dropdown = document.getElementById("span-dropdown");
 // function calls
 init();
 animate();
@@ -62,7 +61,7 @@ function init() {
   group.rotation.x = Math.PI / 3;
   scene.add(group);
   // lights
-  let light = new THREE.PointLight(0x6c6b6b, 1.5);
+  let light = new THREE.PointLight(0x6c6b6b, 1);
   light.position.set(1000, 1000, 2000);
   scene.add(light);
 
@@ -129,56 +128,16 @@ close.addEventListener("click", function () {
   modal.style.display = "none";
   holder.innerHTML = "";
 });
-uploadFile_button.addEventListener("click", function () {
-  holder.innerHTML =
-    '<label class="area" for="upload"><input type="file" id="upload" /><label>  ';
-  let upload = document.getElementById("upload");
-  function onFile() {
-    let file = upload.files[0];
-    let name = file.name;
-    console.log("upload code goes here", name);
-  }
-  upload.addEventListener(
-    "dragenter",
-    function (e) {
-      upload.parentNode.className = "area dragging";
-      console.log("dragenter");
-    },
-    false
-  );
-  upload.addEventListener(
-    "dragleave",
-    function (e) {
-      upload.parentNode.className = "area";
-      console.log("dragleave");
-    },
-    false
-  );
-  upload.addEventListener(
-    "dragdrop",
-    function (e) {
-      onFile();
-      console.log("dragdrop");
-    },
-    false
-  );
-  upload.addEventListener(
-    "change",
-    function (e) {
-      onFile();
-    },
-    false
-  );
+submit_link.addEventListener("click", function () {
+  const link = document.getElementById("link").value;
+  console.log(link);
+  close.click();
 });
-uploadLink_button.addEventListener("click", function () {
-  holder.innerHTML =
-    '<input type="text" id="link" name="link" placeholder="Paste link here" autocomplete="off"/><button class="button" id="load-model-from-url">Submit</button>';
-  const submit_link = document.getElementById("load-model-from-url");
-  submit_link.addEventListener("click", function () {
-    const link = document.getElementById("link").value;
-    console.log(link);
-    close.click();
-  });
+span_dropdown.addEventListener("change", function () {
+  let span_const = parseInt(span_dropdown.value);
+  span_counts = [span_const, span_const, span_const];
+  console.log(span_const);
+  rebuildFFD();
 });
 
 // event handlers
@@ -263,8 +222,8 @@ function build(model) {
 function addModels() {
   smooth_materials = [
     new THREE.MeshPhongMaterial({
-      color: 0xffffff,
-      specular: 0xe5e5e5,
+      color: 0xe9e7e8,
+      specular: 0xc4c2c2,
       shininess: 1,
       side: THREE.DoubleSide,
     }),
@@ -276,8 +235,8 @@ function addModels() {
     }),
   ];
   jaw_material = new THREE.MeshPhongMaterial({
-    color: 0x00ffff,
-    specular: 0xe5e5e5,
+    color: 0xe2bfb9,
+    specular: 0x888688,
     shininess: 1,
     side: THREE.DoubleSide,
   });
@@ -331,9 +290,7 @@ function rebuildFFD(model) {
     );
     modified_verts.push(copy_vertex);
   }
-
   bbox.setFromPoints(modified_verts);
-  console.log(model.children[0].geometry.vertices);
   let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
   ffd.rebuildLattice(bbox, span_counts_copy);
   addCtrlPtMeshes();
