@@ -100,7 +100,7 @@ function init() {
     let blob = new Blob([stl], { type: "text/plain" });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = export_model_namer() + ".stl";
+    a.download = "model.stl";
     a.click();
   });
   exportSelect.addEventListener("click", function () {
@@ -112,7 +112,7 @@ function init() {
       let blob = new Blob([stl], { type: "text/plain" });
       let a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = export_model_namer() + ".stl";
+      a.download = "model.stl";
       a.click();
     } else {
       alert("Please select an object first");
@@ -134,6 +134,7 @@ submit_link.addEventListener("click", function () {
   close.click();
 });
 span_dropdown.addEventListener("change", function () {
+  trfm_ctrl.detach(trfm_ctrl.object);
   let span_const = parseInt(span_dropdown.value);
   span_counts = [span_const, span_const, span_const];
   console.log(span_const);
@@ -203,13 +204,6 @@ function onWindowResize() {
 }
 
 // helper functions
-function export_model_namer() {
-  let export_model_name = prompt("Enter model name");
-  if (!export_model_name) {
-    export_model_name = "model";
-  }
-  return export_model_name;
-}
 function build(model) {
   smooth_verts_undeformed.length = 0;
   for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {

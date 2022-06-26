@@ -47,7 +47,7 @@ body {
 .button:hover {
   background-color: #ffffff;
   color: black;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 canvas {
@@ -146,8 +146,11 @@ canvas {
   margin-left: 10px;
   outline: none;
   font-size: 1rem;
+  border-radius: 5px;
+  border: whitesmoke 0.5px dashed;
 }
 
 option {
   color: black;
+  border-radius: 5px;
 }
