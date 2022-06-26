@@ -11,8 +11,22 @@
 <body>
   <div class="interactives">
     <div class="buttons">
+      <div id="import-modal" class="button">Import Model</div>
       <div id="exportSTL" class="button">Export Whole Model</div>
       <div id="exportSelect" class="button">Export Selected Object</div>
+    </div>
+    <div class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Import Model</h2>
+          <span id="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div id="uploadFile" class="button">Import Model from Storage</div>
+          <div id="uploadLink" class="button">Import Model from Link</div>
+        </div>
+        <div id="holder"></div>
+      </div>
     </div>
   </div>
   <script src="threejs/three.js"></script>
@@ -21,8 +35,11 @@
   <script src="threejs/SubdivisionModifier.js"></script>
   <script src="threejs/STLExporter.js"></script>
   <script src="threejs/OBJLoader.js"></script>
+  <script src="threejs/STLLoader.js"></script>
+
   <script src="ffd.js"></script>
   <script type="module" src="./main.js"></script>
+  <script src="./handle.js"></script>
 </body>
 
 </html>

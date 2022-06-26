@@ -33,6 +33,7 @@ const exportButton = document.getElementById("exportSTL");
 const exportSelect = document.getElementById("exportSelect");
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 const loaderObj = new THREE.OBJLoader();
+// const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
 init();
 console.log(objects);
@@ -66,7 +67,8 @@ function init() {
   document.body.appendChild(renderer.domElement);
   // controls
   orbit_ctrl = new THREE.OrbitControls(camera, renderer.domElement);
-  orbit_ctrl.damping = 0.2;
+  orbit_ctrl.enableDamping = true;
+  orbit_ctrl.dampingFactor = 0.5;
   orbit_ctrl.addEventListener("change", render);
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
   trfm_ctrl.addEventListener("change", render);
@@ -80,7 +82,6 @@ function init() {
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-
   addModels();
 
   exportButton.addEventListener("click", function () {
