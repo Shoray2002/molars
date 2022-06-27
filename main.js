@@ -33,16 +33,16 @@ const loaderObj = new THREE.OBJLoader();
 // const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
-
+// "jaw", "t6", "t7", "t8", "t9", "t10", "t11"
 // document selection
 const exportButton = document.getElementById("exportSTL");
-const exportSelect = document.getElementById("exportSelect");
-const import_modal_button = document.getElementById("import-modal");
-const close = document.getElementById("close");
-const modal = document.querySelector(".modal");
-const uploadLink_button = document.getElementById("uploadLink");
-const submit_link = document.getElementById("load-model-from-url");
-const span_dropdown = document.getElementById("span-dropdown");
+// const exportSelect = document.getElementById("exportSelect");
+// const import_modal_button = document.getElementById("import-modal");
+// const close = document.getElementById("close");
+// const modal = document.querySelector(".modal");
+// const uploadLink_button = document.getElementById("uploadLink");
+// const submit_link = document.getElementById("load-model-from-url");
+// const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
 
@@ -60,6 +60,7 @@ function init() {
   camera.position.set(0, -100, 800);
   camera.lookAt(0, -100, 0);
   scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x23262a);
   group = new THREE.Group();
   group.rotation.x = Math.PI / 3;
   scene.add(group);
@@ -88,105 +89,97 @@ function init() {
     updateLattice();
     deform();
   });
-
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-  window.addEventListener("touchend", touchHandle, false);
+  // window.addEventListener("touchend", touchHandle, false);
+  window.onload = function () {
+    // ask for multiple file download permission
+  };
   addModels();
 }
 
 // event listeners
-import_modal_button.addEventListener("click", function () {
-  modal.style.display = "flex";
-});
-close.addEventListener("click", function () {
-  modal.style.display = "none";
-  holder.innerHTML = "";
-});
-submit_link.addEventListener("click", function () {
-  const link = document.getElementById("link").value;
-  console.log(link);
-  close.click();
-});
-span_dropdown.addEventListener("change", function () {
-  trfm_ctrl.detach(trfm_ctrl.object);
-  let span_const = parseInt(span_dropdown.value);
-  span_counts = [span_const, span_const, span_const];
-  console.log(span_const);
-  rebuildFFD();
-});
+// import_modal_button.addEventListener("click", function () {
+//   modal.style.display = "flex";
+// });
+// close.addEventListener("click", function () {
+//   modal.style.display = "none";
+//   holder.innerHTML = "";
+// });
+// submit_link.addEventListener("click", function () {
+//   const link = document.getElementById("link").value;
+//   console.log(link);
+//   close.click();
+// });
+// span_dropdown.addEventListener("change", function () {
+//   trfm_ctrl.detach(trfm_ctrl.object);
+//   let span_const = parseInt(span_dropdown.value);
+//   span_counts = [span_const, span_const, span_const];
+//   console.log(span_const);
+//   rebuildFFD();
+// });
 opacity_slider.addEventListener("change", function () {
   console.log(opacity_slider.value);
-  console.log(selected_model);
   if (selected_model) {
     selected_model.children[0].material.opacity = opacity_slider.value;
     selected_model.children[1].material.opacity = opacity_slider.value / 10;
   }
 });
+console.log(group);
 exportButton.addEventListener("click", function () {
   removeCtrlPtMeshes();
   removeLatticeLines();
   trfm_ctrl.detach(trfm_ctrl.object);
   selected_model = null;
-  let stl = exporter.parse(group);
-  let blob = new Blob([stl], { type: "text/plain" });
-  let reader = new FileReader();
-  reader.readAsDataURL(blob);
-  reader.onload = function () {
-    let base64data = reader.result;
-    let json = {
-      model_name: "jaw",
-      base64data: base64data,
-    };
-    let json_string = JSON.stringify(json);
-    let blob2 = new Blob([json_string], { type: "text/plain" });
-    a.href = URL.createObjectURL(blob2);
-    a.download = "jaw.json";
-    a.click();
-  };
-});
-exportSelect.addEventListener("click", function () {
-  if (selected_model) {
-    removeCtrlPtMeshes();
-    removeLatticeLines();
-    trfm_ctrl.detach(trfm_ctrl.object);
-    let stl = exporter.parse(selected_model);
+  for (let i = 0; i < group.children.length; i++) {
+    let stl = exporter.parse(group.children[i]);
     let blob = new Blob([stl], { type: "text/plain" });
-    let reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onload = function () {
-      let base64data = reader.result;
-      let json = {
-        model_name: selected_model.name,
-        base64data: base64data,
-      };
-      let json_string = JSON.stringify(json);
-      let blob2 = new Blob([json_string], { type: "text/plain" });
-      a.href = URL.createObjectURL(blob2);
-      a.download = selected_model ? selected_model.name : "model" + ".json";
-      a.click();
-    };
-  } else {
-    alert("Please select an object first");
+    a.href = URL.createObjectURL(blob);
+    a.download = group.children[i].name + ".stl";
+    a.click();
   }
 });
+// exportSelect.addEventListener("click", function () {
+//   if (selected_model) {
+//     removeCtrlPtMeshes();
+//     removeLatticeLines();
+//     trfm_ctrl.detach(trfm_ctrl.object);
+//     let stl = exporter.parse(selected_model);
+//     let blob = new Blob([stl], { type: "text/plain" });
+//     let reader = new FileReader();
+//     reader.readAsDataURL(blob);
+//     reader.onload = function () {
+//       let base64data = reader.result;
+//       let json = {
+//         model_name: selected_model.name,
+//         base64data: base64data,
+//       };
+//       let json_string = JSON.stringify(json);
+//       let blob2 = new Blob([json_string], { type: "text/plain" });
+//       a.href = URL.createObjectURL(blob2);
+//       a.download = selected_model.name + ".json";
+//       a.click();
+//     };
+//   } else {
+//     alert("Please select an object first");
+//   }
+// });
 
 // event handlers
-function touchHandle(e) {
-  e.preventDefault();
-  mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  let intersects = raycaster.intersectObjects(objects, true);
-  if (intersects.length > 0 && intersects[0].object != selected_model) {
-    trfm_ctrl.detach(trfm_ctrl.object);
-    selected_model = intersects[0].object.parent;
-    build(selected_model);
-  }
-}
-
+// function touchHandle(e) {
+//   e.preventDefault();
+//   mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
+//   mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
+//   raycaster.setFromCamera(mouse, camera);
+//   let intersects = raycaster.intersectObjects(objects, true);
+//   if (intersects.length > 0 && intersects[0].object != selected_model) {
+//     trfm_ctrl.detach(trfm_ctrl.object);
+//     selected_model = intersects[0].object.parent;
+//     build(selected_model);
+//   }
+// }
 function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -222,14 +215,14 @@ function onDocumentMouseDown() {
 function keyDown(event) {
   // esc
   if (event.keyCode == 27) {
-    if (modal.style.display == "flex") {
-      close.click();
-    } else {
-      removeCtrlPtMeshes();
-      removeLatticeLines();
-      trfm_ctrl.detach(trfm_ctrl.object);
-      selected_model = null;
-    }
+    // if (modal.style.display == "flex") {
+    //   close.click();
+    // } else {
+    removeCtrlPtMeshes();
+    removeLatticeLines();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = null;
+    // }
   }
   // x
   if (event.keyCode == 88) {
@@ -296,11 +289,7 @@ function addModels() {
           smooth_materials[1],
         ]);
       } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials);
-      if (i == 0) {
-        smooth_mesh.position.set(0, 0, 0);
-      } else {
-        smooth_mesh.position.set(0, 0, 0);
-      }
+      smooth_mesh.position.set(0, 0, 0);
       smooth_mesh.name = model_names[i];
       objects.push(smooth_mesh);
       group.add(smooth_mesh);
