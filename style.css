@@ -163,3 +163,7 @@ option {
   color: black;
   border-radius: 5px;
 }
+
+.slider {
+ display: none;
+}

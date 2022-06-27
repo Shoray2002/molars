@@ -44,6 +44,8 @@ const uploadLink_button = document.getElementById("uploadLink");
 const submit_link = document.getElementById("load-model-from-url");
 const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
+const a = document.createElement("a");
+
 // function calls
 init();
 animate();
@@ -93,33 +95,6 @@ function init() {
   window.addEventListener("keydown", keyDown, false);
   window.addEventListener("touchend", touchHandle, false);
   addModels();
-  exportButton.addEventListener("click", function () {
-    removeCtrlPtMeshes();
-    removeLatticeLines();
-    trfm_ctrl.detach(trfm_ctrl.object);
-    selected_model = null;
-    let stl = exporter.parse(group);
-    let blob = new Blob([stl], { type: "text/plain" });
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "model.stl";
-    a.click();
-  });
-  exportSelect.addEventListener("click", function () {
-    if (selected_model) {
-      removeCtrlPtMeshes();
-      removeLatticeLines();
-      trfm_ctrl.detach(trfm_ctrl.object);
-      let stl = exporter.parse(selected_model);
-      let blob = new Blob([stl], { type: "text/plain" });
-      let a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = selected_model.name ? selected_model.name : "model" + ".stl";
-      a.click();
-    } else {
-      alert("Please select an object first");
-    }
-  });
 }
 
 // event listeners
@@ -148,6 +123,53 @@ opacity_slider.addEventListener("change", function () {
   if (selected_model) {
     selected_model.children[0].material.opacity = opacity_slider.value;
     selected_model.children[1].material.opacity = opacity_slider.value / 10;
+  }
+});
+exportButton.addEventListener("click", function () {
+  removeCtrlPtMeshes();
+  removeLatticeLines();
+  trfm_ctrl.detach(trfm_ctrl.object);
+  selected_model = null;
+  let stl = exporter.parse(group);
+  let blob = new Blob([stl], { type: "text/plain" });
+  let reader = new FileReader();
+  reader.readAsDataURL(blob);
+  reader.onload = function () {
+    let base64data = reader.result;
+    let json = {
+      model_name: "jaw",
+      base64data: base64data,
+    };
+    let json_string = JSON.stringify(json);
+    let blob2 = new Blob([json_string], { type: "text/plain" });
+    a.href = URL.createObjectURL(blob2);
+    a.download = "jaw.json";
+    a.click();
+  };
+});
+exportSelect.addEventListener("click", function () {
+  if (selected_model) {
+    removeCtrlPtMeshes();
+    removeLatticeLines();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    let stl = exporter.parse(selected_model);
+    let blob = new Blob([stl], { type: "text/plain" });
+    let reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = function () {
+      let base64data = reader.result;
+      let json = {
+        model_name: selected_model.name,
+        base64data: base64data,
+      };
+      let json_string = JSON.stringify(json);
+      let blob2 = new Blob([json_string], { type: "text/plain" });
+      a.href = URL.createObjectURL(blob2);
+      a.download = selected_model ? selected_model.name : "model" + ".json";
+      a.click();
+    };
+  } else {
+    alert("Please select an object first");
   }
 });
 
