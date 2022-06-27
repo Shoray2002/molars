@@ -43,6 +43,7 @@ const modal = document.querySelector(".modal");
 const uploadLink_button = document.getElementById("uploadLink");
 const submit_link = document.getElementById("load-model-from-url");
 const span_dropdown = document.getElementById("span-dropdown");
+const opacity_slider = document.getElementById("opacity");
 // function calls
 init();
 animate();
@@ -90,6 +91,7 @@ function init() {
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
+  window.addEventListener("touchend", touchHandle, false);
   addModels();
   exportButton.addEventListener("click", function () {
     removeCtrlPtMeshes();
@@ -112,7 +114,7 @@ function init() {
       let blob = new Blob([stl], { type: "text/plain" });
       let a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "model.stl";
+      a.download = selected_model.name ? selected_model.name : "model" + ".stl";
       a.click();
     } else {
       alert("Please select an object first");
@@ -140,8 +142,29 @@ span_dropdown.addEventListener("change", function () {
   console.log(span_const);
   rebuildFFD();
 });
+opacity_slider.addEventListener("change", function () {
+  console.log(opacity_slider.value);
+  console.log(selected_model);
+  if (selected_model) {
+    selected_model.children[0].material.opacity = opacity_slider.value;
+    selected_model.children[1].material.opacity = opacity_slider.value / 10;
+  }
+});
 
 // event handlers
+function touchHandle(e) {
+  e.preventDefault();
+  mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  let intersects = raycaster.intersectObjects(objects, true);
+  if (intersects.length > 0 && intersects[0].object != selected_model) {
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = intersects[0].object.parent;
+    build(selected_model);
+  }
+}
+
 function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -192,8 +215,6 @@ function keyDown(event) {
     trfm_ctrl.detach(trfm_ctrl.object);
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(objects, true);
-    if (selected_model) {
-    }
     if (intersects.length > 0 && intersects[0].object != selected_model) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
@@ -206,7 +227,6 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
 }
-
 // helper functions
 function build(model) {
   smooth_verts_undeformed.length = 0;
@@ -259,7 +279,7 @@ function addModels() {
       } else {
         smooth_mesh.position.set(0, 0, 0);
       }
-      smooth_mesh.name = "model";
+      smooth_mesh.name = model_names[i];
       objects.push(smooth_mesh);
       group.add(smooth_mesh);
     });
@@ -324,9 +344,8 @@ function addLatticeLines() {
           ctrl_pt_meshes[ffd.getIndex(i + 1, j, k)].position
         );
         let line = new THREE.Line(geometry, lattice_line_material);
-
         lattice_lines.push(line);
-        group.add(line);
+        // group.add(line);
       }
     }
   }
@@ -340,7 +359,7 @@ function addLatticeLines() {
         );
         let line = new THREE.Line(geometry, lattice_line_material);
         lattice_lines.push(line);
-        group.add(line);
+        // group.add(line);
       }
     }
   }
@@ -355,7 +374,7 @@ function addLatticeLines() {
         let line = new THREE.Line(geometry, lattice_line_material);
 
         lattice_lines.push(line);
-        group.add(line);
+        // group.add(line);
       }
     }
   }

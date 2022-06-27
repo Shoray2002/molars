@@ -147,7 +147,8 @@ canvas {
   font-size: 1rem;
 }
 
-#span-dropdown {
+#span-dropdown,
+.slider {
   background: transparent;
   color: #fff;
   padding: 0 2vh 0 3vh;
