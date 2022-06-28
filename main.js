@@ -6,12 +6,13 @@ let camera,
   trfm_ctrl,
   orig_geom,
   smooth_geom,
-  smooth_materials,
-  jaw_material,
+  smooth_materials_teeth,
+  smooth_materials_jaw,
   smooth_mesh,
   exporter_grp,
   group,
-  selected_model;
+  selected_model,
+  last_model;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
 let subd_level = 0;
@@ -33,7 +34,6 @@ const loaderObj = new THREE.OBJLoader();
 // const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
-// "jaw", "t6", "t7", "t8", "t9", "t10", "t11"
 // document selection
 const exportButton = document.getElementById("exportSTL");
 // const exportSelect = document.getElementById("exportSelect");
@@ -45,6 +45,36 @@ const exportButton = document.getElementById("exportSTL");
 // const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
+const wireframe_check = document.getElementById("wireframe-check");
+// materials
+smooth_materials_teeth = [
+  new THREE.MeshPhongMaterial({
+    color: 0xe9e7e8,
+    specular: 0xc4c2c2,
+    shininess: 1,
+    side: THREE.DoubleSide,
+  }),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    wireframe: true,
+    opacity: 0.1,
+    transparent: true,
+  }),
+];
+smooth_materials_jaw = [
+  new THREE.MeshPhongMaterial({
+    color: 0xe2bfb9,
+    specular: 0x888688,
+    shininess: 1,
+    side: THREE.DoubleSide,
+  }),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    wireframe: true,
+    opacity: 0.1,
+    transparent: true,
+  }),
+];
 
 // function calls
 init();
@@ -121,13 +151,29 @@ function init() {
 //   rebuildFFD();
 // });
 opacity_slider.addEventListener("change", function () {
-  console.log(opacity_slider.value);
-  if (selected_model) {
-    selected_model.children[0].material.opacity = opacity_slider.value;
-    selected_model.children[1].material.opacity = opacity_slider.value / 10;
+  last_model = group.children[model_names.length - 1];
+  last_model.children[1].material.opacity = opacity_slider.value / 10;
+});
+wireframe_check.addEventListener("change", function () {
+  last_model = group.children[group.children.length - 1];
+  if (wireframe_check.checked) {
+    group.children[
+      model_names.length - 1
+    ].children[1].material.wireframe = true;
+    group.children[
+      model_names.length - 2
+    ].children[1].material.wireframe = true;
+    opacity_slider.disabled = false;
+  } else {
+    group.children[
+      model_names.length - 1
+    ].children[1].material.wireframe = false;
+    group.children[
+      model_names.length - 2
+    ].children[1].material.wireframe = false;
+    opacity_slider.disabled = true;
   }
 });
-console.log(group);
 exportButton.addEventListener("click", function () {
   removeCtrlPtMeshes();
   removeLatticeLines();
@@ -141,6 +187,7 @@ exportButton.addEventListener("click", function () {
     a.click();
   }
 });
+
 // exportSelect.addEventListener("click", function () {
 //   if (selected_model) {
 //     removeCtrlPtMeshes();
@@ -180,6 +227,8 @@ exportButton.addEventListener("click", function () {
 //     build(selected_model);
 //   }
 // }
+
+// handlers
 function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -253,26 +302,6 @@ function build(model) {
   rebuildFFD(model);
 }
 function addModels() {
-  smooth_materials = [
-    new THREE.MeshPhongMaterial({
-      color: 0xe9e7e8,
-      specular: 0xc4c2c2,
-      shininess: 1,
-      side: THREE.DoubleSide,
-    }),
-    new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      wireframe: true,
-      opacity: 0.1,
-      transparent: true,
-    }),
-  ];
-  jaw_material = new THREE.MeshPhongMaterial({
-    color: 0xe2bfb9,
-    specular: 0x888688,
-    shininess: 1,
-    side: THREE.DoubleSide,
-  });
   for (let i = 0; i < model_names.length; i++) {
     loaderObj.load("./models/" + model_names[i] + ".obj", function (object) {
       let subd_modifier = new THREE.SubdivisionModifier(0);
@@ -284,11 +313,11 @@ function addModels() {
       smooth_geom.computeVertexNormals();
       subd_modifier.modify(smooth_geom);
       if (i == 0) {
-        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, [
-          jaw_material,
-          smooth_materials[1],
-        ]);
-      } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials);
+        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+          smooth_geom,
+          smooth_materials_jaw
+        );
+      } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
       smooth_mesh.position.set(0, 0, 0);
       smooth_mesh.name = model_names[i];
       objects.push(smooth_mesh);
