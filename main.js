@@ -59,18 +59,21 @@ smooth_materials_teeth = [
     wireframe: true,
     opacity: 0.1,
     transparent: true,
+    side: THREE.DoubleSide,
   }),
 ];
 smooth_materials_jaw = [
   new THREE.MeshPhongMaterial({
     color: 0xe2bfb9,
     specular: 0x888688,
+    transparent: true,
     shininess: 1,
     side: THREE.DoubleSide,
   }),
   new THREE.MeshBasicMaterial({
     color: 0x000000,
     wireframe: true,
+    side: THREE.DoubleSide,
     opacity: 0.1,
     transparent: true,
   }),
@@ -152,7 +155,8 @@ function init() {
 // });
 opacity_slider.addEventListener("change", function () {
   last_model = group.children[model_names.length - 1];
-  last_model.children[1].material.opacity = opacity_slider.value / 10;
+  console.log(last_model);
+  last_model.children[0].material.opacity = opacity_slider.value;
 });
 wireframe_check.addEventListener("change", function () {
   last_model = group.children[group.children.length - 1];
@@ -163,7 +167,6 @@ wireframe_check.addEventListener("change", function () {
     group.children[
       model_names.length - 2
     ].children[1].material.wireframe = true;
-    opacity_slider.disabled = false;
   } else {
     group.children[
       model_names.length - 1
@@ -171,7 +174,6 @@ wireframe_check.addEventListener("change", function () {
     group.children[
       model_names.length - 2
     ].children[1].material.wireframe = false;
-    opacity_slider.disabled = true;
   }
 });
 exportButton.addEventListener("click", function () {
@@ -313,10 +315,10 @@ function addModels() {
       smooth_geom.computeVertexNormals();
       subd_modifier.modify(smooth_geom);
       if (i == 0) {
-        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
-          smooth_geom,
-          smooth_materials_jaw
-        );
+        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, [
+          smooth_materials_jaw[0],
+          smooth_materials_teeth[1],
+        ]);
       } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
       smooth_mesh.position.set(0, 0, 0);
       smooth_mesh.name = model_names[i];
