@@ -116,7 +116,7 @@ function init() {
   orbit_ctrl.maxDistance = 3400;
   orbit_ctrl.addEventListener("change", render);
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
-  trfm_ctrl.size = 0.2;
+  trfm_ctrl.size = 0.4;
   trfm_ctrl.addEventListener("change", render);
   scene.add(trfm_ctrl);
   trfm_ctrl.addEventListener("objectChange", function (e) {
@@ -203,7 +203,7 @@ function touchEndHandle(e) {
   doubletap();
 }
 function touchStartHandle() {
-  if (selected_model && ctrl_pt_mesh_selected) {
+  if (selected_model || ctrl_pt_mesh_selected) {
     orbit_ctrl.enabled = false;
   }
 }
