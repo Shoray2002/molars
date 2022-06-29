@@ -80,21 +80,13 @@ init();
 animate();
 // main function
 function init() {
-  // camera = new THREE.PerspectiveCamera(
-  //   45,
-  //   window.innerWidth / window.innerHeight,
-  //   1,
-  //   100000
-  // );
-  camera = new THREE.OrthographicCamera(
-    window.innerWidth / -2,
-    window.innerWidth / 2,
-    window.innerHeight / 2,
-    window.innerHeight / -2,
+  camera = new THREE.PerspectiveCamera(
+    20,
+    window.innerWidth / window.innerHeight,
     1,
     100000
   );
-  camera.position.set(0, -100, 800);
+  camera.position.set(0, -100, 1800);
   camera.lookAt(0, -100, 0);
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x23262a);
@@ -120,8 +112,11 @@ function init() {
   orbit_ctrl = new THREE.OrbitControls(camera, renderer.domElement);
   orbit_ctrl.enableDamping = true;
   orbit_ctrl.dampingFactor = 0.5;
+  orbit_ctrl.minDistance = 200;
+  orbit_ctrl.maxDistance = 3400;
   orbit_ctrl.addEventListener("change", render);
   trfm_ctrl = new THREE.TransformControls(camera, renderer.domElement);
+  trfm_ctrl.size = 0.2;
   trfm_ctrl.addEventListener("change", render);
   scene.add(trfm_ctrl);
   trfm_ctrl.addEventListener("objectChange", function (e) {
