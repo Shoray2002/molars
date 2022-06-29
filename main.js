@@ -47,6 +47,7 @@ const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
 const wireframe_check = document.getElementById("wireframe-check");
+const webgl = document.getElementById("webgl");
 // materials
 smooth_materials_teeth = [
   new THREE.MeshPhongMaterial({
@@ -106,11 +107,13 @@ function init() {
   let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1.5);
   scene.add(ambientLight);
   // renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({
+    canvas: webgl,
+    antialias: true,
+  });
   renderer.setClearColor(0x000000);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
   // controls
   orbit_ctrl = new THREE.OrbitControls(camera, renderer.domElement);
   orbit_ctrl.enableDamping = true;
@@ -123,13 +126,13 @@ function init() {
     updateLattice();
     deform();
   });
-
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-  window.addEventListener("touchend", touchHandle, false);
-  window.addEventListener("dblclick", handleDblclick, false);
+  webgl.addEventListener("touchend", touchEndHandle, false);
+  webgl.addEventListener("touchstart", touchStartHandle, false);
+  webgl.addEventListener("dblclick", handleDblclick, false);
   addModels();
 }
 
@@ -210,7 +213,7 @@ exportButton.addEventListener("click", function () {
 // });
 
 // event handlers
-function touchHandle(e) {
+function touchEndHandle(e) {
   e.preventDefault();
   mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
@@ -240,7 +243,11 @@ function touchHandle(e) {
   }
   doubletap();
 }
-
+function touchStartHandle() {
+  if (selected_model && ctrl_pt_mesh_selected) {
+    orbit_ctrl.enabled = false;
+  }
+}
 // handlers
 function onDocumentMouseMove(event) {
   event.preventDefault();
@@ -505,7 +512,12 @@ function doubletap() {
   var now = new Date().getTime();
   var timesince = now - latesttap;
   if (timesince < 600 && timesince > 0) {
-    unSelect();
+    if (ctrl_pt_mesh_selected) {
+      trfm_ctrl.detach(trfm_ctrl.object);
+      ctrl_pt_mesh_selected = null;
+    } else {
+      unSelect();
+    }
   } else {
     latesttap = new Date().getTime();
   }

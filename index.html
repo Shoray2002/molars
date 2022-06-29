@@ -9,19 +9,19 @@
 <link rel="stylesheet" href="./style.css" />
 
 <body>
+  <canvas id="webgl"></canvas>
   <div class="upper interactives distribution">
-    <!-- <div id="import-modal" class="button">Import Model</div> -->
     <div class="opacity-slider">
       <div class="slider">
         <label for="wireframe-check">Wireframe Visible : </label>
         <input type="checkbox" name="wireframe-check" id="wireframe-check" checked>
         <br>
-        <label for="opacity">Wireframe Opacity : </label>
+        <label for="opacity">Opacity : </label>
         <input type="range" id="opacity" name="opacity" min="0.01" max="1" step="0.01" value="1">
       </div>
     </div>
     <div class="selection">
-      <label id="span_count-label" for="span-dropdown">Control Point Multiplier : </label>
+      <label id="span_count-label" for="span-dropdown">Deformation Points : </label>
       <select name="span_dropdown" id="span-dropdown">
         <option value="1">2</option>
         <option value="2" selected>3</option>
@@ -31,22 +31,9 @@
   </div>
   <div class="lower interactives centerised">
     <div class="buttons">
-      <div id="exportSTL" class="button">Done</div>
+      <div id="exportSTL" class="button">Apply 2 Design</div>
       <!-- <div id="exportSelect" class="button">Export Selected Object</div> -->
     </div>
-    <!-- <div class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Import Model Via Link</h2>
-          <span id="close">&times;</span>
-        </div>
-        <div class="modal-body">
-          <input type="text" id="link" name="link" placeholder="Paste link here" autocomplete="off" /><button
-            class="button" id="load-model-from-url">Submit</button>
-        </div>
-        <div id="holder"></div>
-      </div>
-    </div> -->
   </div>
   <script src="threejs/three.js"></script>
   <script src="threejs/OrbitControls.js"></script>
@@ -55,7 +42,6 @@
   <script src="threejs/STLExporter.js"></script>
   <script src="threejs/OBJLoader.js"></script>
   <script src="threejs/STLLoader.js"></script>
-
   <script src="ffd.js"></script>
   <script type="module" src="./main.js"></script>
 </body>

@@ -1,8 +1,23 @@
+@font-face {
+  font-family: "Coves Light";
+  src: url("./assets/Coves Light.otf");
+}
+
 body {
+  font-family: "Coves Light", sans-serif;
   margin: 0;
   padding: 0;
-  background: #fff;
+  background: rgb(0, 0, 0);
   overflow: hidden;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  /* pointer-events: none; */
+  /* display: none; */
 }
 
 .lower {
@@ -31,7 +46,7 @@ body {
 
 .interactives {
   position: absolute;
-  z-index: 1;
+  z-index: 999;
   display: flex;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -57,13 +72,6 @@ body {
   background-color: #ffffff;
   color: black;
   border-radius: 8px;
-}
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
 }
 
 .modal {
@@ -156,7 +164,6 @@ canvas {
   outline: none;
   font-size: 1rem;
   border-radius: 5px;
-  border: whitesmoke 0.5px dashed;
 }
 
 option {
