@@ -42,7 +42,7 @@ const exportButton = document.getElementById("exportSTL");
 // const modal = document.querySelector(".modal");
 // const uploadLink_button = document.getElementById("uploadLink");
 // const submit_link = document.getElementById("load-model-from-url");
-// const span_dropdown = document.getElementById("span-dropdown");
+const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
 const wireframe_check = document.getElementById("wireframe-check");
@@ -126,7 +126,7 @@ function init() {
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-  // window.addEventListener("touchend", touchHandle, false);
+  window.addEventListener("touchend", touchHandle, false);
   window.onload = function () {
     // ask for multiple file download permission
   };
@@ -146,13 +146,15 @@ function init() {
 //   console.log(link);
 //   close.click();
 // });
-// span_dropdown.addEventListener("change", function () {
-//   trfm_ctrl.detach(trfm_ctrl.object);
-//   let span_const = parseInt(span_dropdown.value);
-//   span_counts = [span_const, span_const, span_const];
-//   console.log(span_const);
-//   rebuildFFD();
-// });
+span_dropdown.addEventListener("change", function () {
+  trfm_ctrl.detach(trfm_ctrl.object);
+  let span_const = parseInt(span_dropdown.value);
+  span_counts = [span_const, span_const, span_const];
+  console.log(span_const);
+  if (selected_model) {
+    rebuildFFD(selected_model);
+  }
+});
 opacity_slider.addEventListener("change", function () {
   last_model = group.children[model_names.length - 1];
   console.log(last_model);
@@ -160,20 +162,13 @@ opacity_slider.addEventListener("change", function () {
 });
 wireframe_check.addEventListener("change", function () {
   last_model = group.children[group.children.length - 1];
-  if (wireframe_check.checked) {
-    group.children[
-      model_names.length - 1
-    ].children[1].material.wireframe = true;
-    group.children[
-      model_names.length - 2
-    ].children[1].material.wireframe = true;
+  const MODEL_QUANT = model_names.length;
+  if (wireframe_check.checked && group.children.length >= MODEL_QUANT) {
+    group.children[MODEL_QUANT - 1].children[1].material.wireframe = true;
+    group.children[MODEL_QUANT - 2].children[1].material.wireframe = true;
   } else {
-    group.children[
-      model_names.length - 1
-    ].children[1].material.wireframe = false;
-    group.children[
-      model_names.length - 2
-    ].children[1].material.wireframe = false;
+    group.children[MODEL_QUANT - 1].children[1].material.wireframe = false;
+    group.children[MODEL_QUANT - 2].children[1].material.wireframe = false;
   }
 });
 exportButton.addEventListener("click", function () {
@@ -217,18 +212,34 @@ exportButton.addEventListener("click", function () {
 // });
 
 // event handlers
-// function touchHandle(e) {
-//   e.preventDefault();
-//   mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
-//   mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
-//   raycaster.setFromCamera(mouse, camera);
-//   let intersects = raycaster.intersectObjects(objects, true);
-//   if (intersects.length > 0 && intersects[0].object != selected_model) {
-//     trfm_ctrl.detach(trfm_ctrl.object);
-//     selected_model = intersects[0].object.parent;
-//     build(selected_model);
-//   }
-// }
+function touchHandle(e) {
+  e.preventDefault();
+  mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  if (selected_model) {
+    let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
+    if (
+      clicked_ctrl_point.length > 0 &&
+      ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
+    ) {
+      orbit_ctrl.enabled = false;
+      console.log(clicked_ctrl_point[0].object.name);
+      if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
+      ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
+      trfm_ctrl.attach(ctrl_pt_mesh_selected);
+    } else {
+      orbit_ctrl.enabled = true;
+    }
+  } else {
+    trfm_ctrl.detach(trfm_ctrl.object);
+    let intersects = raycaster.intersectObjects(objects, true);
+    if (intersects.length > 0 && intersects[0].object != selected_model) {
+      selected_model = intersects[0].object.parent;
+      build(selected_model);
+    }
+  }
+}
 
 // handlers
 function onDocumentMouseMove(event) {
@@ -249,18 +260,27 @@ function onDocumentMouseMove(event) {
   }
 }
 function onDocumentMouseDown() {
-  let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
-  if (
-    clicked_ctrl_point.length > 0 &&
-    ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
-  ) {
-    orbit_ctrl.enabled = false;
-    console.log(clicked_ctrl_point[0].object.name);
-    if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
-    ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
-    trfm_ctrl.attach(ctrl_pt_mesh_selected);
+  if (selected_model) {
+    let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
+    if (
+      clicked_ctrl_point.length > 0 &&
+      ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
+    ) {
+      orbit_ctrl.enabled = false;
+      console.log(clicked_ctrl_point[0].object.name);
+      if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
+      ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
+      trfm_ctrl.attach(ctrl_pt_mesh_selected);
+    } else {
+      orbit_ctrl.enabled = true;
+    }
   } else {
-    orbit_ctrl.enabled = true;
+    trfm_ctrl.detach(trfm_ctrl.object);
+    let intersects = raycaster.intersectObjects(objects, true);
+    if (intersects.length > 0 && intersects[0].object != selected_model) {
+      selected_model = intersects[0].object.parent;
+      build(selected_model);
+    }
   }
 }
 function keyDown(event) {
