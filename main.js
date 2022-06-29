@@ -13,6 +13,7 @@ let camera,
   group,
   selected_model,
   last_model;
+let latesttap;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
 let subd_level = 0;
@@ -122,14 +123,13 @@ function init() {
     updateLattice();
     deform();
   });
+
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
   window.addEventListener("touchend", touchHandle, false);
-  window.onload = function () {
-    // ask for multiple file download permission
-  };
+  window.addEventListener("dblclick", handleDblclick, false);
   addModels();
 }
 
@@ -150,14 +150,12 @@ span_dropdown.addEventListener("change", function () {
   trfm_ctrl.detach(trfm_ctrl.object);
   let span_const = parseInt(span_dropdown.value);
   span_counts = [span_const, span_const, span_const];
-  console.log(span_const);
   if (selected_model) {
     rebuildFFD(selected_model);
   }
 });
 opacity_slider.addEventListener("change", function () {
   last_model = group.children[model_names.length - 1];
-  console.log(last_model);
   last_model.children[0].material.opacity = opacity_slider.value;
 });
 wireframe_check.addEventListener("change", function () {
@@ -224,8 +222,9 @@ function touchHandle(e) {
       ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
     ) {
       orbit_ctrl.enabled = false;
-      console.log(clicked_ctrl_point[0].object.name);
-      if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
+      if (ctrl_pt_mesh_selected) {
+        trfm_ctrl.detach(trfm_ctrl.object);
+      }
       ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
       trfm_ctrl.attach(ctrl_pt_mesh_selected);
     } else {
@@ -239,6 +238,7 @@ function touchHandle(e) {
       build(selected_model);
     }
   }
+  doubletap();
 }
 
 // handlers
@@ -267,7 +267,6 @@ function onDocumentMouseDown() {
       ctrl_pt_mesh_selected != clicked_ctrl_point[0].object
     ) {
       orbit_ctrl.enabled = false;
-      console.log(clicked_ctrl_point[0].object.name);
       if (ctrl_pt_mesh_selected) trfm_ctrl.detach(trfm_ctrl.object);
       ctrl_pt_mesh_selected = clicked_ctrl_point[0].object;
       trfm_ctrl.attach(ctrl_pt_mesh_selected);
@@ -283,17 +282,13 @@ function onDocumentMouseDown() {
     }
   }
 }
+function handleDblclick() {
+  unSelect();
+}
 function keyDown(event) {
   // esc
   if (event.keyCode == 27) {
-    // if (modal.style.display == "flex") {
-    //   close.click();
-    // } else {
-    removeCtrlPtMeshes();
-    removeLatticeLines();
-    trfm_ctrl.detach(trfm_ctrl.object);
-    selected_model = null;
-    // }
+    unSelect();
   }
   // x
   if (event.keyCode == 88) {
@@ -313,6 +308,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   render();
 }
+
 // helper functions
 function build(model) {
   smooth_verts_undeformed.length = 0;
@@ -494,4 +490,24 @@ function deform() {
     selected_model.children[0].geometry.vertices[i].copy(eval_pt);
   }
   selected_model.children[0].geometry.verticesNeedUpdate = true;
+}
+
+function unSelect() {
+  if (selected_model) {
+    removeCtrlPtMeshes();
+    removeLatticeLines();
+    trfm_ctrl.detach(trfm_ctrl.object);
+    selected_model = null;
+  }
+}
+
+function doubletap() {
+  var now = new Date().getTime();
+  var timesince = now - latesttap;
+  if (timesince < 600 && timesince > 0) {
+    unSelect();
+  } else {
+    latesttap = new Date().getTime();
+  }
+  latesttap = new Date().getTime();
 }
