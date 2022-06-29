@@ -37,12 +37,6 @@ let exporter = new THREE.STLExporter();
 const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
 // document selection
 const exportButton = document.getElementById("exportSTL");
-// const exportSelect = document.getElementById("exportSelect");
-// const import_modal_button = document.getElementById("import-modal");
-// const close = document.getElementById("close");
-// const modal = document.querySelector(".modal");
-// const uploadLink_button = document.getElementById("uploadLink");
-// const submit_link = document.getElementById("load-model-from-url");
 const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
@@ -86,9 +80,17 @@ init();
 animate();
 // main function
 function init() {
-  camera = new THREE.PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
+  // camera = new THREE.PerspectiveCamera(
+  //   45,
+  //   window.innerWidth / window.innerHeight,
+  //   1,
+  //   100000
+  // );
+  camera = new THREE.OrthographicCamera(
+    window.innerWidth / -2,
+    window.innerWidth / 2,
+    window.innerHeight / 2,
+    window.innerHeight / -2,
     1,
     100000
   );
@@ -137,18 +139,6 @@ function init() {
 }
 
 // event listeners
-// import_modal_button.addEventListener("click", function () {
-//   modal.style.display = "flex";
-// });
-// close.addEventListener("click", function () {
-//   modal.style.display = "none";
-//   holder.innerHTML = "";
-// });
-// submit_link.addEventListener("click", function () {
-//   const link = document.getElementById("link").value;
-//   console.log(link);
-//   close.click();
-// });
 span_dropdown.addEventListener("change", function () {
   trfm_ctrl.detach(trfm_ctrl.object);
   let span_const = parseInt(span_dropdown.value);
@@ -185,32 +175,6 @@ exportButton.addEventListener("click", function () {
     a.click();
   }
 });
-
-// exportSelect.addEventListener("click", function () {
-//   if (selected_model) {
-//     removeCtrlPtMeshes();
-//     removeLatticeLines();
-//     trfm_ctrl.detach(trfm_ctrl.object);
-//     let stl = exporter.parse(selected_model);
-//     let blob = new Blob([stl], { type: "text/plain" });
-//     let reader = new FileReader();
-//     reader.readAsDataURL(blob);
-//     reader.onload = function () {
-//       let base64data = reader.result;
-//       let json = {
-//         model_name: selected_model.name,
-//         base64data: base64data,
-//       };
-//       let json_string = JSON.stringify(json);
-//       let blob2 = new Blob([json_string], { type: "text/plain" });
-//       a.href = URL.createObjectURL(blob2);
-//       a.download = selected_model.name + ".json";
-//       a.click();
-//     };
-//   } else {
-//     alert("Please select an object first");
-//   }
-// });
 
 // event handlers
 function touchEndHandle(e) {
@@ -498,26 +462,22 @@ function deform() {
   }
   selected_model.children[0].geometry.verticesNeedUpdate = true;
 }
-
 function unSelect() {
-  if (selected_model) {
+  if (ctrl_pt_mesh_selected) {
+    trfm_ctrl.detach(trfm_ctrl.object);
+    ctrl_pt_mesh_selected = null;
+  } else if (selected_model) {
     removeCtrlPtMeshes();
     removeLatticeLines();
     trfm_ctrl.detach(trfm_ctrl.object);
     selected_model = null;
   }
 }
-
 function doubletap() {
   var now = new Date().getTime();
   var timesince = now - latesttap;
   if (timesince < 600 && timesince > 0) {
-    if (ctrl_pt_mesh_selected) {
-      trfm_ctrl.detach(trfm_ctrl.object);
-      ctrl_pt_mesh_selected = null;
-    } else {
-      unSelect();
-    }
+    unSelect();
   } else {
     latesttap = new Date().getTime();
   }
