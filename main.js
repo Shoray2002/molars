@@ -155,18 +155,18 @@ span_dropdown.addEventListener("change", function () {
   }
 });
 opacity_slider.addEventListener("change", function () {
-  last_model = group.children[model_names.length - 1];
-  last_model.children[0].material.opacity = opacity_slider.value;
+  // search for jaw mesh in group
+  let jaw_mesh = group.children.find(function (child) {
+    return child.name === "jaw";
+  });
+  jaw_mesh.children[0].material.opacity = opacity_slider.value;
 });
 wireframe_check.addEventListener("change", function () {
-  last_model = group.children[group.children.length - 1];
-  const MODEL_QUANT = model_names.length;
-  if (wireframe_check.checked && group.children.length >= MODEL_QUANT) {
-    group.children[MODEL_QUANT - 1].children[1].material.wireframe = true;
-    group.children[MODEL_QUANT - 2].children[1].material.wireframe = true;
+  last_model = group.children[0];
+  if (wireframe_check.checked) {
+    last_model.children[1].material.wireframe = true;
   } else {
-    group.children[MODEL_QUANT - 1].children[1].material.wireframe = false;
-    group.children[MODEL_QUANT - 2].children[1].material.wireframe = false;
+    last_model.children[1].material.wireframe = false;
   }
 });
 exportButton.addEventListener("click", function () {
