@@ -291,46 +291,72 @@ function addModels() {
     let subd_modifier = new THREE.SubdivisionModifier(0);
     let orig_geom = new THREE.Geometry();
     if (model_names[i].includes(".obj")) {
-      loaderObj.load(properPath, function (object) {
-        orig_geom = object.children[0].geometry;
-        orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
-        smooth_geom = orig_geom.clone();
-        smooth_geom.mergeVertices();
-        smooth_geom.computeFaceNormals();
-        smooth_geom.computeVertexNormals();
-        subd_modifier.modify(smooth_geom);
-        if (model_names[i].includes("jaw")) {
-          smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
-            smooth_geom,
-            [smooth_materials_jaw[0], smooth_materials_teeth[1]]
-          );
-        } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
-        smooth_mesh.position.set(0, 0, 0);
-        smooth_mesh.name = model_names[i];
-        objects.push(smooth_mesh);
-        group.add(smooth_mesh);
-      });
+      loaderObj.load(
+        properPath,
+        function (object) {
+          orig_geom = object.children[0].geometry;
+          orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
+          smooth_geom = orig_geom.clone();
+          smooth_geom.mergeVertices();
+          smooth_geom.computeFaceNormals();
+          smooth_geom.computeVertexNormals();
+          subd_modifier.modify(smooth_geom);
+          if (model_names[i].includes("jaw")) {
+            smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+              smooth_geom,
+              [smooth_materials_jaw[0], smooth_materials_teeth[1]]
+            );
+          } else
+            smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+              smooth_geom,
+              smooth_materials_teeth
+            );
+          smooth_mesh.position.set(0, 0, 0);
+          smooth_mesh.name = model_names[i];
+          objects.push(smooth_mesh);
+          group.add(smooth_mesh);
+        },
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        function (error) {
+          console.log("Error loading model: " + error);
+        }
+      );
     }
     if (model_names[i].includes(".stl")) {
-      loaderSTL.load(properPath, function (geometry) {
-        orig_geom = geometry;
-        orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
-        smooth_geom = orig_geom.clone();
-        smooth_geom.mergeVertices();
-        smooth_geom.computeFaceNormals();
-        smooth_geom.computeVertexNormals();
-        subd_modifier.modify(smooth_geom);
-        if (model_names[i].includes("jaw")) {
-          smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
-            smooth_geom,
-            [smooth_materials_jaw[0], smooth_materials_teeth[1]]
-          );
-        } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
-        smooth_mesh.position.set(0, 0, 0);
-        smooth_mesh.name = model_names[i];
-        objects.push(smooth_mesh);
-        group.add(smooth_mesh);
-      });
+      loaderSTL.load(
+        properPath,
+        function (geometry) {
+          orig_geom = geometry;
+          orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
+          smooth_geom = orig_geom.clone();
+          smooth_geom.mergeVertices();
+          smooth_geom.computeFaceNormals();
+          smooth_geom.computeVertexNormals();
+          subd_modifier.modify(smooth_geom);
+          if (model_names[i].includes("jaw")) {
+            smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+              smooth_geom,
+              [smooth_materials_jaw[0], smooth_materials_teeth[1]]
+            );
+          } else
+            smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+              smooth_geom,
+              smooth_materials_teeth
+            );
+          smooth_mesh.position.set(0, 0, 0);
+          smooth_mesh.name = model_names[i];
+          objects.push(smooth_mesh);
+          group.add(smooth_mesh);
+        },
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        function (error) {
+          console.log("Error loading model: " + error);
+        }
+      );
     }
   }
 }
