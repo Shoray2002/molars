@@ -14,6 +14,7 @@ let camera,
   group,
   selected_model,
   last_model;
+
 let latesttap;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
