@@ -143,8 +143,6 @@ span_dropdown.addEventListener("change", function () {
   }
 });
 opacity_slider.addEventListener("change", function () {
-  // search for jaw mesh in group
-  console.log(group.children);
   let jaw_mesh = group.children.find(function (child) {
     return child.name.includes("jaw");
   });
@@ -318,7 +316,9 @@ function addModels() {
           group.add(smooth_mesh);
         },
         function (xhr) {
-          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          console.log(
+            model_names[i]+" " + Math.round((xhr.loaded / xhr.total) * 100) + "% loaded"
+          );
         },
         function (error) {
           console.log("Error loading model: " + error);
