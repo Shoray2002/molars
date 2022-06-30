@@ -144,8 +144,9 @@ span_dropdown.addEventListener("change", function () {
 });
 opacity_slider.addEventListener("change", function () {
   // search for jaw mesh in group
+  console.log(group.children);
   let jaw_mesh = group.children.find(function (child) {
-    return child.name === "jaw";
+    return child.name.includes("jaw");
   });
   jaw_mesh.children[0].material.opacity = opacity_slider.value;
 });
