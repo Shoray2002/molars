@@ -32,9 +32,9 @@ let lattice_line_material = new THREE.LineBasicMaterial({
 });
 const objects = [];
 const loaderObj = new THREE.OBJLoader();
-// const loaderSTL = new THREE.STLLoader();
+const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
-const model_names = ["jaw", "t6", "t7", "t8", "t9", "t10", "t11"];
+const model_names = filenames;
 // document selection
 const exportButton = document.getElementById("exportSTL");
 const span_dropdown = document.getElementById("span-dropdown");
@@ -287,26 +287,51 @@ function build(model) {
 }
 function addModels() {
   for (let i = 0; i < model_names.length; i++) {
-    loaderObj.load("./models/" + model_names[i] + ".obj", function (object) {
-      let subd_modifier = new THREE.SubdivisionModifier(0);
-      let orig_geom = object.children[0].geometry;
-      orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
-      smooth_geom = orig_geom.clone();
-      smooth_geom.mergeVertices();
-      smooth_geom.computeFaceNormals();
-      smooth_geom.computeVertexNormals();
-      subd_modifier.modify(smooth_geom);
-      if (i == 0) {
-        smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, [
-          smooth_materials_jaw[0],
-          smooth_materials_teeth[1],
-        ]);
-      } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
-      smooth_mesh.position.set(0, 0, 0);
-      smooth_mesh.name = model_names[i];
-      objects.push(smooth_mesh);
-      group.add(smooth_mesh);
-    });
+    let properPath = folderpath + model_names[i];
+    let subd_modifier = new THREE.SubdivisionModifier(0);
+    let orig_geom = new THREE.Geometry();
+    if (model_names[i].includes(".obj")) {
+      loaderObj.load(properPath, function (object) {
+        orig_geom = object.children[0].geometry;
+        orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
+        smooth_geom = orig_geom.clone();
+        smooth_geom.mergeVertices();
+        smooth_geom.computeFaceNormals();
+        smooth_geom.computeVertexNormals();
+        subd_modifier.modify(smooth_geom);
+        if (model_names[i].includes("jaw")) {
+          smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+            smooth_geom,
+            [smooth_materials_jaw[0], smooth_materials_teeth[1]]
+          );
+        } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
+        smooth_mesh.position.set(0, 0, 0);
+        smooth_mesh.name = model_names[i];
+        objects.push(smooth_mesh);
+        group.add(smooth_mesh);
+      });
+    }
+    if (model_names[i].includes(".stl")) {
+      loaderSTL.load(properPath, function (geometry) {
+        orig_geom = geometry;
+        orig_geom = new THREE.Geometry().fromBufferGeometry(orig_geom);
+        smooth_geom = orig_geom.clone();
+        smooth_geom.mergeVertices();
+        smooth_geom.computeFaceNormals();
+        smooth_geom.computeVertexNormals();
+        subd_modifier.modify(smooth_geom);
+        if (model_names[i].includes("jaw")) {
+          smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
+            smooth_geom,
+            [smooth_materials_jaw[0], smooth_materials_teeth[1]]
+          );
+        } else smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(smooth_geom, smooth_materials_teeth);
+        smooth_mesh.position.set(0, 0, 0);
+        smooth_mesh.name = model_names[i];
+        objects.push(smooth_mesh);
+        group.add(smooth_mesh);
+      });
+    }
   }
 }
 function render() {
