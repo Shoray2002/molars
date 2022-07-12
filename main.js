@@ -107,7 +107,7 @@ function init() {
     canvas: webgl,
     antialias: true,
   });
-  renderer.setClearColor(0x000000);
+  renderer.setClearColor(0x313339);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   // controls
