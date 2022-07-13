@@ -126,7 +126,8 @@ function init() {
     deform();
   });
   trfm_ctrl2 = new THREE.TransformControls(camera, renderer.domElement);
-  trfm_ctrl2.size = 1;
+  trfm_ctrl2.setSize(0.6);
+  trfm_ctrl2.setMode("rotate");
   scene.add(trfm_ctrl2);
 
   window.addEventListener("resize", onWindowResize);
@@ -273,7 +274,7 @@ function keyDown(event) {
     }
   }
   // space
-  if (event.keyCode == 32) {
+  if (event.keyCode == 18) {
     trfm_ctrl2.detach(trfm_ctrl2.object);
     trfm_ctrl2.attach(group);
   }
