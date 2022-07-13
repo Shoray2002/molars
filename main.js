@@ -134,6 +134,7 @@ function init() {
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
+  window.addEventListener("keyup", keyUp, false);
   webgl.addEventListener("touchend", touchEndHandle, false);
   webgl.addEventListener("touchstart", touchStartHandle, false);
   webgl.addEventListener("dblclick", handleDblclick, false);
@@ -248,7 +249,11 @@ function onDocumentMouseDown() {
   } else if (trfm_ctrl.object !== group) {
     trfm_ctrl.detach(trfm_ctrl.object);
     let intersects = raycaster.intersectObjects(objects, true);
-    if (intersects.length > 0 && intersects[0].object != selected_model) {
+    if (
+      intersects.length > 0 &&
+      intersects[0].object != selected_model &&
+      intersects[0].object.parent.name !== "jaw.obj"
+    ) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
     }
@@ -268,15 +273,25 @@ function keyDown(event) {
     trfm_ctrl.detach(trfm_ctrl.object);
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(objects, true);
-    if (intersects.length > 0 && intersects[0].object != selected_model) {
+    if (
+      intersects.length > 0 &&
+      intersects[0].object != selected_model &&
+      intersects[0].object.parent.name !== "jaw.obj"
+    ) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
     }
   }
-  // space
+  // alt
   if (event.keyCode == 18) {
     trfm_ctrl2.detach(trfm_ctrl2.object);
     trfm_ctrl2.attach(group);
+  }
+}
+
+function keyUp(event) {
+  if (event.keyCode == 18) {
+    trfm_ctrl2.detach(trfm_ctrl2.object);
   }
 }
 function onWindowResize() {
@@ -525,9 +540,10 @@ function deform() {
   selected_model.children[0].geometry.verticesNeedUpdate = true;
 }
 function unSelect() {
-  if (trfm_ctrl2.object === group) {
-    trfm_ctrl2.detach(trfm_ctrl2.object);
-  } else if (ctrl_pt_mesh_selected) {
+  // if (trfm_ctrl2.object === group) {
+  //   trfm_ctrl2.detach(trfm_ctrl2.object);
+  // } else
+  if (ctrl_pt_mesh_selected) {
     ctrl_pt_mesh_selected = null;
     trfm_ctrl.detach(trfm_ctrl.object);
   } else if (selected_model) {
