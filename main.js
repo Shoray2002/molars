@@ -4,7 +4,7 @@ let camera,
   renderer,
   orbit_ctrl,
   trfm_ctrl,
-  trfm_ctrl2,
+  // trfm_ctrl2,
   orig_geom,
   smooth_geom,
   smooth_materials_teeth,
@@ -125,16 +125,16 @@ function init() {
     updateLattice();
     deform();
   });
-  trfm_ctrl2 = new THREE.TransformControls(camera, renderer.domElement);
-  trfm_ctrl2.setSize(0.6);
-  trfm_ctrl2.setMode("rotate");
-  scene.add(trfm_ctrl2);
+  // trfm_ctrl2 = new THREE.TransformControls(camera, renderer.domElement);
+  // trfm_ctrl2.setSize(0.6);
+  // trfm_ctrl2.setMode("rotate");
+  // scene.add(trfm_ctrl2);
 
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-  window.addEventListener("keyup", keyUp, false);
+  // window.addEventListener("keyup", keyUp, false);
   webgl.addEventListener("touchend", touchEndHandle, false);
   webgl.addEventListener("touchstart", touchStartHandle, false);
   webgl.addEventListener("dblclick", handleDblclick, false);
@@ -283,17 +283,29 @@ function keyDown(event) {
     }
   }
   // alt
-  if (event.keyCode == 18) {
-    trfm_ctrl2.detach(trfm_ctrl2.object);
-    trfm_ctrl2.attach(group);
-  }
+  // if (event.keyCode == 18) {
+  //   trfm_ctrl2.detach(trfm_ctrl2.object);
+  //   trfm_ctrl2.attach(group);
+  // }
 }
-
-function keyUp(event) {
-  if (event.keyCode == 18) {
-    trfm_ctrl2.detach(trfm_ctrl2.object);
-  }
-}
+// function keyUp() {
+//   console.log(
+//     "Camera Postion: " +
+//       Math.round(camera.position.x) +
+//       " " +
+//       Math.round(camera.position.y) +
+//       " " +
+//       Math.round(camera.position.z)
+//   );
+//   console.log(
+//     "Object Postion: " +
+//       group.position.x +
+//       " " +
+//       group.position.y +
+//       " " +
+//       group.position.z
+//   );
+// }
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
