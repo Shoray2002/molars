@@ -4,7 +4,6 @@ let camera,
   renderer,
   orbit_ctrl,
   trfm_ctrl,
-  // trfm_ctrl2,
   orig_geom,
   smooth_geom,
   smooth_materials_teeth,
@@ -14,7 +13,6 @@ let camera,
   group,
   selected_model,
   last_model;
-
 let latesttap;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
@@ -36,9 +34,9 @@ const objects = [];
 const loaderObj = new THREE.OBJLoader();
 const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLExporter();
-const model_names = filenames;
 // document selection
 const exportButton = document.getElementById("exportSTL");
+const testButton = document.getElementById("TEST_M");
 const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const a = document.createElement("a");
@@ -125,20 +123,14 @@ function init() {
     updateLattice();
     deform();
   });
-  // trfm_ctrl2 = new THREE.TransformControls(camera, renderer.domElement);
-  // trfm_ctrl2.setSize(0.6);
-  // trfm_ctrl2.setMode("rotate");
-  // scene.add(trfm_ctrl2);
-
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("mousemove", onDocumentMouseMove);
   window.addEventListener("mousedown", onDocumentMouseDown);
   window.addEventListener("keydown", keyDown, false);
-  // window.addEventListener("keyup", keyUp, false);
   webgl.addEventListener("touchend", touchEndHandle, false);
   webgl.addEventListener("touchstart", touchStartHandle, false);
   webgl.addEventListener("dblclick", handleDblclick, false);
-  addModels();
+  // addModels();
 }
 
 // event listeners
@@ -171,13 +163,31 @@ exportButton.addEventListener("click", function () {
   selected_model = null;
   for (let i = 0; i < group.children.length; i++) {
     let stl = exporter.parse(group.children[i]);
-    let blob = new Blob([stl], { type: "text/plain" });
+    let blob = new Blob([stl]);
+
+    blobToBase64(blob, function (base64Str, filename) {
+      console.log(filename);
+      return base64Str;
+    });
     a.href = URL.createObjectURL(blob);
-    a.download = group.children[i].name + ".stl";
+    a.download = group.children[i].name.split(".")[0] + ".stl";
     a.click();
   }
+  // webkit.messageHandlers.callback.postMessage(a.href);
 });
 
+var blobToBase64 = function (blob, cb) {
+  var reader = new FileReader();
+  reader.onload = function () {
+    var dataUrl = reader.result;
+    var base64 = dataUrl.split(",")[1];
+    cb(base64, blob.type);
+  };
+  reader.readAsDataURL(blob);
+};
+testButton.addEventListener("click", function () {
+  addModels();
+});
 // event handlers
 function touchEndHandle(e) {
   e.preventDefault();
@@ -282,30 +292,7 @@ function keyDown(event) {
       build(selected_model);
     }
   }
-  // alt
-  // if (event.keyCode == 18) {
-  //   trfm_ctrl2.detach(trfm_ctrl2.object);
-  //   trfm_ctrl2.attach(group);
-  // }
 }
-// function keyUp() {
-//   console.log(
-//     "Camera Postion: " +
-//       Math.round(camera.position.x) +
-//       " " +
-//       Math.round(camera.position.y) +
-//       " " +
-//       Math.round(camera.position.z)
-//   );
-//   console.log(
-//     "Object Postion: " +
-//       group.position.x +
-//       " " +
-//       group.position.y +
-//       " " +
-//       group.position.z
-//   );
-// }
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -324,11 +311,11 @@ function build(model) {
   rebuildFFD(model);
 }
 function addModels() {
-  for (let i = 0; i < model_names.length; i++) {
-    let properPath = folderpath + model_names[i];
+  for (let i = 0; i < filenames.length; i++) {
+    let properPath = folderpath + "/" + filenames[i];
     let subd_modifier = new THREE.SubdivisionModifier(0);
     let orig_geom = new THREE.Geometry();
-    if (model_names[i].includes(".obj")) {
+    if (filenames[i].includes(".obj")) {
       loaderObj.load(
         properPath,
         function (object) {
@@ -339,7 +326,7 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (model_names[i].includes("jaw")) {
+          if (filenames[i].includes("jaw")) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
@@ -350,13 +337,13 @@ function addModels() {
               smooth_materials_teeth
             );
           smooth_mesh.position.set(0, 0, 0);
-          smooth_mesh.name = model_names[i];
+          smooth_mesh.name = filenames[i];
           objects.push(smooth_mesh);
           group.add(smooth_mesh);
         },
         function (xhr) {
           console.log(
-            model_names[i] +
+            filenames[i] +
               " " +
               Math.round((xhr.loaded / xhr.total) * 100) +
               "% loaded"
@@ -367,7 +354,7 @@ function addModels() {
         }
       );
     }
-    if (model_names[i].includes(".stl")) {
+    if (filenames[i].includes(".stl")) {
       loaderSTL.load(
         properPath,
         function (geometry) {
@@ -378,7 +365,7 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (model_names[i].includes("jaw")) {
+          if (filenames[i].includes("jaw")) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
@@ -389,7 +376,7 @@ function addModels() {
               smooth_materials_teeth
             );
           smooth_mesh.position.set(0, 0, 0);
-          smooth_mesh.name = model_names[i];
+          smooth_mesh.name = filenames[i];
           objects.push(smooth_mesh);
           group.add(smooth_mesh);
         },
@@ -552,9 +539,6 @@ function deform() {
   selected_model.children[0].geometry.verticesNeedUpdate = true;
 }
 function unSelect() {
-  // if (trfm_ctrl2.object === group) {
-  //   trfm_ctrl2.detach(trfm_ctrl2.object);
-  // } else
   if (ctrl_pt_mesh_selected) {
     ctrl_pt_mesh_selected = null;
     trfm_ctrl.detach(trfm_ctrl.object);
