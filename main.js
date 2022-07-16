@@ -143,7 +143,7 @@ span_dropdown.addEventListener("change", function () {
 });
 opacity_slider.addEventListener("change", function () {
   let jaw_mesh = group.children.find(function (child) {
-    return child.name.includes("jaw");
+    return child.name.includes("jaw") || child.name.toLower().includes("origin");
   });
   jaw_mesh.children[0].material.opacity = opacity_slider.value;
 });
@@ -168,7 +168,6 @@ exportButton.addEventListener("click", function () {
       return base64Str;
     });
   }
-  console.log(base64Models);
   // webkit.messageHandlers.callback.postMessage(a.href);
 });
 
@@ -258,7 +257,8 @@ function onDocumentMouseDown() {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      intersects[0].object.parent.name !== "jaw.obj"
+      (intersects[0].object.parent.name !== "jaw.obj" ||
+        intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
     ) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
@@ -282,7 +282,8 @@ function keyDown(event) {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      intersects[0].object.parent.name !== "jaw.obj"
+      (intersects[0].object.parent.name !== "jaw.obj" ||
+        intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
     ) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
@@ -311,7 +312,7 @@ function addModels() {
     let properPath = folderpath + "/" + filenames[i];
     let subd_modifier = new THREE.SubdivisionModifier(0);
     let orig_geom = new THREE.Geometry();
-    if (filenames[i].includes(".obj")) {
+    if (filenames[i].toLowerCase().includes(".obj")) {
       loaderObj.load(
         properPath,
         function (object) {
@@ -322,7 +323,7 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (filenames[i].includes("jaw")) {
+          if (filenames[i].includes("jaw") || filenames[i].toLowerCase().includes("origin")) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
@@ -350,7 +351,7 @@ function addModels() {
         }
       );
     }
-    if (filenames[i].includes(".stl")) {
+    if (filenames[i].toLowerCase().includes(".stl")) {
       loaderSTL.load(
         properPath,
         function (geometry) {
@@ -361,7 +362,7 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (filenames[i].includes("jaw")) {
+          if (filenames[i].includes("jaw")|| filenames[i].toLowerCase().includes("origin")) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
