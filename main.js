@@ -39,7 +39,6 @@ const exportButton = document.getElementById("exportSTL");
 const testButton = document.getElementById("TEST_M");
 const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
-const a = document.createElement("a");
 const wireframe_check = document.getElementById("wireframe-check");
 const webgl = document.getElementById("webgl");
 // materials
@@ -164,15 +163,12 @@ exportButton.addEventListener("click", function () {
   for (let i = 0; i < group.children.length; i++) {
     let stl = exporter.parse(group.children[i]);
     let blob = new Blob([stl]);
-
     blobToBase64(blob, function (base64Str, filename) {
-      console.log(filename);
+      base64Models[group.children[i].name] = base64Str;
       return base64Str;
     });
-    a.href = URL.createObjectURL(blob);
-    a.download = group.children[i].name.split(".")[0] + ".stl";
-    a.click();
   }
+  console.log(base64Models);
   // webkit.messageHandlers.callback.postMessage(a.href);
 });
 

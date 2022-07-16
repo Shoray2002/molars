@@ -49,15 +49,13 @@
   <script>
     let filenames = ["jaw.obj", "t6.obj", "t7.obj", "t8.obj", "t9.obj", "t10.obj", "t11.obj"]
     let folderpath = "./models/"
-    
-    function loadALL_Files(file,array) {
-        console.log(array)
-        console.log(file)
-        filenames = array
-        folderpath = file
+    let base64Models = {}
+    function loadALL_Files(file, array) {
+      console.log(array)
+      console.log(file)
+      filenames = array
+      folderpath = file
     }
-    
-    
   </script>
   <script type="module" src="./main.js"></script>
 </body>
