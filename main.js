@@ -33,7 +33,7 @@ let lattice_line_material = new THREE.LineBasicMaterial({
 const objects = [];
 const loaderObj = new THREE.OBJLoader();
 const loaderSTL = new THREE.STLLoader();
-let exporter = new THREE.STLExporter();
+let exporter = new THREE.STLBinaryExporter();
 // document selection
 const exportButton = document.getElementById("exportSTL");
 const testButton = document.getElementById("TEST_M");
@@ -143,7 +143,9 @@ span_dropdown.addEventListener("change", function () {
 });
 opacity_slider.addEventListener("change", function () {
   let jaw_mesh = group.children.find(function (child) {
-    return child.name.includes("jaw") || child.name.toLower().includes("origin");
+    return (
+      child.name.includes("jaw") || child.name.toLower().includes("origin")
+    );
   });
   jaw_mesh.children[0].material.opacity = opacity_slider.value;
 });
@@ -176,6 +178,7 @@ var blobToBase64 = function (blob, cb) {
   reader.onload = function () {
     var dataUrl = reader.result;
     var base64 = dataUrl.split(",")[1];
+    console.log(base64);
     cb(base64, blob.type);
   };
   reader.readAsDataURL(blob);
@@ -323,7 +326,10 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (filenames[i].includes("jaw") || filenames[i].toLowerCase().includes("origin")) {
+          if (
+            filenames[i].includes("jaw") ||
+            filenames[i].toLowerCase().includes("origin")
+          ) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
@@ -362,7 +368,10 @@ function addModels() {
           smooth_geom.computeFaceNormals();
           smooth_geom.computeVertexNormals();
           subd_modifier.modify(smooth_geom);
-          if (filenames[i].includes("jaw")|| filenames[i].toLowerCase().includes("origin")) {
+          if (
+            filenames[i].includes("jaw") ||
+            filenames[i].toLowerCase().includes("origin")
+          ) {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
