@@ -144,7 +144,7 @@ span_dropdown.addEventListener("change", function () {
 opacity_slider.addEventListener("change", function () {
   let jaw_mesh = group.children.find(function (child) {
     return (
-      child.name.includes("jaw") || child.name.toLower().includes("origin")
+      child.name.includes("jaw") || child.name.toLowerCase().includes("origin")
     );
   });
   jaw_mesh.children[0].material.opacity = opacity_slider.value;
@@ -260,7 +260,7 @@ function onDocumentMouseDown() {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      (intersects[0].object.parent.name !== "jaw.obj" ||
+      (intersects[0].object.parent.name !== "jaw.obj" &&
         intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
     ) {
       selected_model = intersects[0].object.parent;
@@ -285,7 +285,7 @@ function keyDown(event) {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      (intersects[0].object.parent.name !== "jaw.obj" ||
+      (intersects[0].object.parent.name !== "jaw.obj" &&
         intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
     ) {
       selected_model = intersects[0].object.parent;
