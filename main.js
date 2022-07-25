@@ -25,11 +25,13 @@ let ctrl_pt_material = new THREE.MeshLambertMaterial({ color: 0x00ffff });
 let ctrl_pt_meshes = [];
 let ctrl_pt_mesh_selected = null;
 let lattice_lines = [];
+let edited_models = [];
 let lattice_line_material = new THREE.LineBasicMaterial({
   color: 0xffffff,
   transparent: true,
   opacity: 0.5,
 });
+let models_loaded = false;
 const objects = [];
 const loaderObj = new THREE.OBJLoader();
 const loaderSTL = new THREE.STLLoader();
@@ -46,7 +48,7 @@ smooth_materials_teeth = [
   new THREE.MeshPhongMaterial({
     color: 0xe9e7e8,
     specular: 0xc4c2c2,
-    shininess: 1,
+    shininess:0.5,
     side: THREE.DoubleSide,
   }),
   new THREE.MeshBasicMaterial({
@@ -93,11 +95,18 @@ function init() {
   group.rotation.x = Math.PI / 3;
   scene.add(group);
   // lights
-  let light = new THREE.PointLight(0x6c6b6b, 1);
-  light.position.set(1000, 1000, 2000);
-  scene.add(light);
 
-  let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1.5);
+  let light = new THREE.PointLight(0x6c6b6b, 1);
+  light.position.set(50, 500, 2000);
+  scene.add(light);
+  let light2 = new THREE.PointLight(0x969696, 0.5);
+  light2.position.set(-50, -250, -1000);
+  scene.add(light2);
+  let light3 = new THREE.PointLight(0x969696, 0.5);
+  light3.position.set(50, -250, 1000);
+  scene.add(light3);
+
+  let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1);
   scene.add(ambientLight);
   // renderer
   renderer = new THREE.WebGLRenderer({
@@ -162,13 +171,19 @@ exportButton.addEventListener("click", function () {
   removeLatticeLines();
   trfm_ctrl.detach(trfm_ctrl.object);
   selected_model = null;
-  for (let i = 0; i < group.children.length; i++) {
-    let stl = exporter.parse(group.children[i]);
-    let blob = new Blob([stl]);
-    blobToBase64(blob, function (base64Str, filename) {
-      base64Models[group.children[i].name] = base64Str;
-      return base64Str;
-    });
+  if (edited_models.length === 0) {
+    alert("No models have been edited yet");
+  } else {
+    for (let i = 0; i < group.children.length; i++) {
+      if (edited_models.includes(group.children[i].name)) {
+        let stl = exporter.parse(group.children[i]);
+        let blob = new Blob([stl]);
+        blobToBase64(blob, function (base64Str, filename) {
+          base64Models[group.children[i].name] = base64Str;
+          return base64Str;
+        });
+      }
+    }
   }
   // webkit.messageHandlers.callback.postMessage(a.href);
 });
@@ -184,13 +199,17 @@ var blobToBase64 = function (blob, cb) {
   reader.readAsDataURL(blob);
 };
 testButton.addEventListener("click", function () {
-  addModels();
+  if (!models_loaded) {
+    addModels();
+    models_loaded = true;
+  }
 });
 // event handlers
 function touchEndHandle(e) {
   e.preventDefault();
   mouse.x = (e.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
+  console.log(mouse);
   raycaster.setFromCamera(mouse, camera);
   if (selected_model) {
     let clicked_ctrl_point = raycaster.intersectObjects(ctrl_pt_meshes, false);
@@ -212,6 +231,10 @@ function touchEndHandle(e) {
     let intersects = raycaster.intersectObjects(objects, true);
     if (intersects.length > 0 && intersects[0].object != selected_model) {
       selected_model = intersects[0].object.parent;
+      if (!edited_models.includes(selected_model.name)) {
+        edited_models.push(selected_model.name);
+      }
+      console.log(selected_model);
       build(selected_model);
     }
   }
@@ -260,10 +283,13 @@ function onDocumentMouseDown() {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      (intersects[0].object.parent.name !== "jaw.obj" &&
-        intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
+      intersects[0].object.parent.name !== "jaw.obj" &&
+      intersects[0].object.parent.name.toLowerCase() !== "origin.stl"
     ) {
       selected_model = intersects[0].object.parent;
+      if (!edited_models.includes(selected_model.name)) {
+        edited_models.push(selected_model.name);
+      }
       build(selected_model);
     }
   }
@@ -285,8 +311,8 @@ function keyDown(event) {
     if (
       intersects.length > 0 &&
       intersects[0].object != selected_model &&
-      (intersects[0].object.parent.name !== "jaw.obj" &&
-        intersects[0].object.parent.name.toLowerCase() !== "origin.stl")
+      intersects[0].object.parent.name !== "jaw.obj" &&
+      intersects[0].object.parent.name.toLowerCase() !== "origin.stl"
     ) {
       selected_model = intersects[0].object.parent;
       build(selected_model);
