@@ -120,6 +120,7 @@ function init() {
   renderer.setClearColor(0x313339);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding
   // controls
   orbit_ctrl = new THREE.OrbitControls(camera, renderer.domElement);
   orbit_ctrl.enableDamping = true;
