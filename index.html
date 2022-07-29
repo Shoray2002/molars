@@ -36,6 +36,9 @@
     <div class="buttons">
       <div id="TEST_M" class="button">TEST SHOW</div>
     </div>
+    <div class="buttons hidebutton">
+      <div id="SAVE_M" class="button">MATRIX</div>
+    </div>
 
   </div>
   <script src="threejs/three.js"></script>
@@ -46,16 +49,35 @@
   <script src="threejs/OBJLoader.js"></script>
   <script src="threejs/STLLoader.js"></script>
   <script src="ffd.js"></script>
+  
   <script>
     let filenames = ["jaw.obj", "t6.obj", "t7.obj", "t8.obj", "t9.obj", "t10.obj", "t11.obj"]
     let folderpath = "./models/"
-    let base64Models = {}
+    var base64Models = {}
+    var linkData = new Array();
+    var blobIDs = new Array();
+
+    let matrixFileName = ""
+    let fMatrix = []
+
     function loadALL_Files(file, array) {
       console.log(array)
       console.log(file)
       filenames = array
       folderpath = file
     }
+    function getSavedData() {
+      return linkData.toString();
+    }
+    function getBlobIds() {
+      return blobIDs.toString();
+    }
+
+    function applyTransform(fileName, matrix) {
+      console.log("APPLY TRANSFORM TO TOOTH");
+      matrixFileName = fileName;
+      fMatrix = matrix;
+    };
   </script>
   <script type="module" src="./main.js"></script>
 </body>

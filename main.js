@@ -39,6 +39,7 @@ let exporter = new THREE.STLBinaryExporter();
 // document selection
 const exportButton = document.getElementById("exportSTL");
 const testButton = document.getElementById("TEST_M");
+const saveButton = document.getElementById("SAVE_M");
 const span_dropdown = document.getElementById("span-dropdown");
 const opacity_slider = document.getElementById("opacity");
 const wireframe_check = document.getElementById("wireframe-check");
@@ -48,7 +49,7 @@ smooth_materials_teeth = [
   new THREE.MeshPhongMaterial({
     color: 0xe9e7e8,
     specular: 0xc4c2c2,
-    shininess:0.5,
+    shininess: 0.5,
     side: THREE.DoubleSide,
   }),
   new THREE.MeshBasicMaterial({
@@ -105,6 +106,9 @@ function init() {
   let light3 = new THREE.PointLight(0x969696, 0.5);
   light3.position.set(50, -250, 1000);
   scene.add(light3);
+  let light4 = new THREE.PointLight(0x969696, 0.5);
+  light4.position.set(50, -250, -1000);
+  scene.add(light4);
 
   let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1);
   scene.add(ambientLight);
@@ -167,6 +171,9 @@ wireframe_check.addEventListener("change", function () {
   }
 });
 exportButton.addEventListener("click", function () {
+  webkit.messageHandlers.callback.postMessage("Export-start");
+  linkData = new Array();
+  blobIDs = new Array();
   removeCtrlPtMeshes();
   removeLatticeLines();
   trfm_ctrl.detach(trfm_ctrl.object);
@@ -180,12 +187,16 @@ exportButton.addEventListener("click", function () {
         let blob = new Blob([stl]);
         blobToBase64(blob, function (base64Str, filename) {
           base64Models[group.children[i].name] = base64Str;
+          linkData.push(base64Str);
+          blobIDs.push(group.children[i].name);
+          console.log(filename);
           return base64Str;
         });
       }
     }
   }
   // webkit.messageHandlers.callback.postMessage(a.href);
+  webkit.messageHandlers.callback.postMessage("Export-done");
 });
 
 var blobToBase64 = function (blob, cb) {
@@ -204,6 +215,16 @@ testButton.addEventListener("click", function () {
     models_loaded = true;
   }
 });
+
+saveButton.addEventListener("click", function () {
+  console.log("APPLY TRANSFORM TO TOOTH");
+  let mesh = group.children.find(function (child) {
+    return child.name == matrixFileName;
+  });
+  console.log(mesh.children[0].name);
+  mesh.children[0].applyMatrix4(fMatrix);
+});
+
 // event handlers
 function touchEndHandle(e) {
   e.preventDefault();
