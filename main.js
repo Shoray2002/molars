@@ -120,7 +120,7 @@ function init() {
   renderer.setClearColor(0x313339);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.outputEncoding = THREE.sRGBEncoding
+  renderer.outputEncoding = THREE.sRGBEncoding;
   // controls
   orbit_ctrl = new THREE.OrbitControls(camera, renderer.domElement);
   orbit_ctrl.enableDamping = true;
@@ -172,7 +172,7 @@ wireframe_check.addEventListener("change", function () {
   }
 });
 exportButton.addEventListener("click", function () {
-  webkit.messageHandlers.callback.postMessage("Export-start");
+  // webkit.messageHandlers.callback.postMessage("Export-start");
   linkData = new Array();
   blobIDs = new Array();
   removeCtrlPtMeshes();
@@ -197,14 +197,22 @@ exportButton.addEventListener("click", function () {
     }
   }
   // webkit.messageHandlers.callback.postMessage(a.href);
-  webkit.messageHandlers.callback.postMessage("Export-done");
+  // webkit.messageHandlers.callback.postMessage("Export-done");
+});
+saveButton.addEventListener("click", function () {
+  console.log("APPLY TRANSFORM TO TOOTH");
+  let mesh = group.children.find(function (child) {
+    return child.name == matrixFileName;
+  });
+  console.log(mesh.children[0].name);
+  mesh.children[0].applyMatrix4(fMatrix);
 });
 
-var blobToBase64 = function (blob, cb) {
-  var reader = new FileReader();
+let blobToBase64 = function (blob, cb) {
+  let reader = new FileReader();
   reader.onload = function () {
-    var dataUrl = reader.result;
-    var base64 = dataUrl.split(",")[1];
+    let dataUrl = reader.result;
+    let base64 = dataUrl.split(",")[1];
     console.log(base64);
     cb(base64, blob.type);
   };
@@ -215,15 +223,6 @@ testButton.addEventListener("click", function () {
     addModels();
     models_loaded = true;
   }
-});
-
-saveButton.addEventListener("click", function () {
-  console.log("APPLY TRANSFORM TO TOOTH");
-  let mesh = group.children.find(function (child) {
-    return child.name == matrixFileName;
-  });
-  console.log(mesh.children[0].name);
-  mesh.children[0].applyMatrix4(fMatrix);
 });
 
 // event handlers
@@ -604,8 +603,8 @@ function unSelect() {
   }
 }
 function doubletap() {
-  var now = new Date().getTime();
-  var timesince = now - latesttap;
+  let now = new Date().getTime();
+  let timesince = now - latesttap;
   if (timesince < 600 && timesince > 0) {
     unSelect();
   } else {
