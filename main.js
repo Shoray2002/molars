@@ -88,12 +88,12 @@ function init() {
     1,
     100000
   );
-  camera.position.set(0, -100, 1800);
-  camera.lookAt(0, -100, 0);
+  camera.position.set(0, -650, 1800);
+  camera.lookAt(0, -650, 0);
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x23262a);
   group = new THREE.Group();
-  group.rotation.x = Math.PI / 3;
+  group.rotation.x = Math.PI / 2;
   scene.add(group);
   // lights
 
@@ -186,13 +186,19 @@ exportButton.addEventListener("click", function () {
       if (edited_models.includes(group.children[i].name)) {
         let stl = exporter.parse(group.children[i]);
         let blob = new Blob([stl]);
-        blobToBase64(blob, function (base64Str, filename) {
-          base64Models[group.children[i].name] = base64Str;
-          linkData.push(base64Str);
-          blobIDs.push(group.children[i].name);
-          console.log(filename);
-          return base64Str;
-        });
+        // download the model
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = group.children[i].name.split(".")[0] + ".stl";
+        link.click();
+
+        // blobToBase64(blob, function (base64Str, filename) {
+        //   base64Models[group.children[i].name] = base64Str;
+        //   linkData.push(base64Str);
+        //   blobIDs.push(group.children[i].name);
+        //   console.log(filename);
+        //   return base64Str;
+        // });
       }
     }
   }
