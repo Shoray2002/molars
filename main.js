@@ -88,28 +88,26 @@ function init() {
     1,
     100000
   );
-  camera.position.set(0, -650, 1800);
-  camera.lookAt(0, -650, 0);
+  camera.position.set(0, 1200, 1000);
+  // camera.translateZ(500);
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x23262a);
   group = new THREE.Group();
-  group.rotation.x = Math.PI / 2;
   scene.add(group);
   // lights
 
-  let light = new THREE.PointLight(0x6c6b6b, 1);
-  light.position.set(50, 500, 2000);
+  let light = new THREE.PointLight(0x6c6b6b, 1.5);
+  light.position.set(0, 500, 200);
   scene.add(light);
   let light2 = new THREE.PointLight(0x969696, 0.5);
-  light2.position.set(-50, -250, -1000);
+  light2.position.set(-50, -250, 1000);
   scene.add(light2);
   let light3 = new THREE.PointLight(0x969696, 0.5);
-  light3.position.set(50, -250, 1000);
+  light3.position.set(50, -250, -1000);
   scene.add(light3);
   let light4 = new THREE.PointLight(0x969696, 0.5);
-  light4.position.set(50, -250, -1000);
+  light4.position.set(50, -250, 1000);
   scene.add(light4);
-
   let ambientLight = new THREE.AmbientLight(0x6c6b6b, 1);
   scene.add(ambientLight);
   // renderer
