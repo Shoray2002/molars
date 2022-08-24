@@ -12,7 +12,8 @@ let camera,
   exporter_grp,
   group,
   selected_model,
-  last_model;
+  last_model,
+  copy_mesh;
 let latesttap;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
@@ -169,40 +170,30 @@ wireframe_check.addEventListener("change", function () {
     last_model.children[1].material.wireframe = false;
   }
 });
-exportButton.addEventListener("click", function () {
-  // webkit.messageHandlers.callback.postMessage("Export-start");
-  linkData = new Array();
-  blobIDs = new Array();
-  removeCtrlPtMeshes();
-  removeLatticeLines();
-  trfm_ctrl.detach(trfm_ctrl.object);
-  selected_model = null;
-  if (edited_models.length === 0) {
-    alert("No models have been edited yet");
-  } else {
-    for (let i = 0; i < group.children.length; i++) {
-      if (edited_models.includes(group.children[i].name)) {
-        let stl = exporter.parse(group.children[i]);
-        let blob = new Blob([stl]);
-        // download the model
-        let link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = group.children[i].name.split(".")[0] + ".stl";
-        link.click();
-
-        // blobToBase64(blob, function (base64Str, filename) {
-        //   base64Models[group.children[i].name] = base64Str;
-        //   linkData.push(base64Str);
-        //   blobIDs.push(group.children[i].name);
-        //   console.log(filename);
-        //   return base64Str;
-        // });
-      }
-    }
-  }
-  // webkit.messageHandlers.callback.postMessage(a.href);
-  // webkit.messageHandlers.callback.postMessage("Export-done");
+exportButton.addEventListener("click", () => {
+  applyM4(
+    "t8.obj",
+    new THREE.Matrix4().set(
+      11,
+      12,
+      13,
+      14,
+      21,
+      22,
+      23,
+      24,
+      31,
+      32,
+      33,
+      34,
+      41,
+      42,
+      43,
+      44
+    )
+  );
 });
+
 saveButton.addEventListener("click", function () {
   console.log("APPLY TRANSFORM TO TOOTH");
   let mesh = group.children.find(function (child) {
@@ -212,16 +203,6 @@ saveButton.addEventListener("click", function () {
   mesh.children[0].applyMatrix4(fMatrix);
 });
 
-let blobToBase64 = function (blob, cb) {
-  let reader = new FileReader();
-  reader.onload = function () {
-    let dataUrl = reader.result;
-    let base64 = dataUrl.split(",")[1];
-    console.log(base64);
-    cb(base64, blob.type);
-  };
-  reader.readAsDataURL(blob);
-};
 testButton.addEventListener("click", function () {
   if (!models_loaded) {
     addModels();
@@ -615,4 +596,60 @@ function doubletap() {
     latesttap = new Date().getTime();
   }
   latesttap = new Date().getTime();
+}
+function blobToBase64(blob, cb) {
+  let reader = new FileReader();
+  reader.onload = function () {
+    let dataUrl = reader.result;
+    let base64 = dataUrl.split(",")[1];
+    console.log(base64);
+    cb(base64, blob.type);
+  };
+  reader.readAsDataURL(blob);
+}
+function applyM4(name, matrix) {
+  // webkit.messageHandlers.callback.postMessage("Export-start");
+  linkData = new Array();
+  blobIDs = new Array();
+  removeCtrlPtMeshes();
+  removeLatticeLines();
+  trfm_ctrl.detach(trfm_ctrl.object);
+  selected_model = null;
+  if (edited_models.length === 0) {
+    alert("No models have been edited yet");
+  } else {
+    for (let i = 0; i < group.children.length; i++) {
+      if (
+        edited_models.includes(group.children[i].name) &&
+        group.children[i].name === name
+      ) {
+        console.log(group.children[i].name);
+        copy_mesh = group.children[i].clone();
+        // convert copy_mesh to objecct
+        let object = new THREE.Object3D();
+        object.add(copy_mesh);
+        object.name = name;
+        console.log(object);
+        object.applyMatrix4(matrix);
+        console.log("applied");
+        let stl = exporter.parse(copy_mesh);
+        let blob = new Blob([stl]);
+
+        // let link = document.createElement("a");
+        // link.href = URL.createObjectURL(blob);
+        // link.download = group.children[i].name.split(".")[0] + ".stl";
+        // link.click();
+
+        blobToBase64(blob, function (base64Str, filename) {
+          base64Models[group.children[i].name] = base64Str;
+          linkData.push(base64Str);
+          blobIDs.push(group.children[i].name);
+          console.log(filename);
+          return base64Str;
+        });
+      }
+    }
+  }
+  // webkit.messageHandlers.callback.postMessage(a.href);
+  // webkit.messageHandlers.callback.postMessage("Export-done");
 }
