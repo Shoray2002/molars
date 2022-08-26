@@ -623,15 +623,8 @@ function applyM4(name, matrix) {
         edited_models.includes(group.children[i].name) &&
         group.children[i].name === name
       ) {
-        console.log(group.children[i].name);
         copy_mesh = group.children[i].clone();
-        // convert copy_mesh to objecct
-        let object = new THREE.Object3D();
-        object.add(copy_mesh);
-        object.name = name;
-        console.log(object);
-        object.applyMatrix4(matrix);
-        console.log("applied");
+        copy_mesh.modelViewMatrix.multiplyMatrices(matrix, copy_mesh.matrix);
         let stl = exporter.parse(copy_mesh);
         let blob = new Blob([stl]);
 
