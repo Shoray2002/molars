@@ -602,7 +602,7 @@ function blobToBase64(blob, cb) {
   reader.onload = function () {
     let dataUrl = reader.result;
     let base64 = dataUrl.split(",")[1];
-    console.log(base64);
+    // console.log(base64);
     cb(base64, blob.type);
   };
   reader.readAsDataURL(blob);
@@ -625,7 +625,7 @@ function applyM4(name, matrix) {
       ) {
         copy_mesh = group.children[i].clone();
         copy_mesh.modelViewMatrix.multiplyMatrices(matrix, copy_mesh.matrix);
-        console.log(copy_mesh);
+        // console.log(copy_mesh);
         let stl = exporter.parse(copy_mesh);
         let blob = new Blob([stl]);
 
@@ -638,7 +638,7 @@ function applyM4(name, matrix) {
           base64Models[group.children[i].name] = base64Str;
           linkData.push(base64Str);
           blobIDs.push(group.children[i].name);
-          console.log(filename);
+          // console.log(filename);
           return base64Str;
         });
       }
