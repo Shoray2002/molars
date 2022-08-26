@@ -625,6 +625,7 @@ function applyM4(name, matrix) {
       ) {
         copy_mesh = group.children[i].clone();
         copy_mesh.modelViewMatrix.multiplyMatrices(matrix, copy_mesh.matrix);
+        console.log(copy_mesh);
         let stl = exporter.parse(copy_mesh);
         let blob = new Blob([stl]);
 
