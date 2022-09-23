@@ -180,18 +180,18 @@ exportButton.addEventListener("click", () => {
 });
 
 saveButton.addEventListener("click", function () {
-  // console.log("APPLY TRANSFORM TO TOOTH");
-  // let mesh = group.children.find(function (child) {
-  //   return child.name == matrixFileName;
-  // });
-  // console.log(mesh.children[0].name);
-  // mesh.children[0].applyMatrix4(fMatrix);
-  applyM4(
-    "t8.obj",
-    new THREE.Matrix4().set(
-      1.01,0,0,0,0,1.132,0,0,0,0,1.15,0,0,0,0,1.14
-    )
-  );
+  console.log("APPLY TRANSFORM TO TOOTH");
+  let mesh = group.children.find(function (child) {
+    return child.name == matrixFileName;
+  });
+  console.log(mesh.children[0].name);
+  mesh.children[0].applyMatrix4(fMatrix);
+  // applyM4(
+  //   "t8.obj",
+  //   new THREE.Matrix4().set(
+  //     1.01,0,0,0,0,1.132,0,0,0,0,1.15,0,0,0,0,1.14
+  //   )
+  // );
 });
 
 testButton.addEventListener("click", function () {
