@@ -27,10 +27,9 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#demo">Demo</a></li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#model">Model</a></li>
-    <li><a href="#blog">Blog</a></li>
+<!--     <li><a href="#usage">Usage</a></li> -->
+<!--     <li><a href="#model">Model</a></li> -->
+    <li><a href="#links">Useful Links</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -76,38 +75,13 @@ To get a local copy up and running follow these simple example steps.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- DEMO -->
-## Demo
-Checkout this project demo [here](https://youtu.be/KA11Fvv025c)
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-Examples 
-
-![ujh5hoov9l8l3svpirgb](https://user-images.githubusercontent.com/76423272/170884713-2b285002-2e25-4446-90c9-6b68427ce5ed.gif)
-![second](https://user-images.githubusercontent.com/76423272/170884866-19c23aa6-d382-4ef3-9146-d78f4dc75e12.gif)
-![Screencast from 29-05-22 11_34_12 PM IST (1)](https://user-images.githubusercontent.com/76423272/170885153-85534867-d239-4c3f-bba9-9cc70e3023f8.gif)
-
+<!-- LINKS -->
+### Links
+* [Free Functional Deform](https://github.com/glennchun/free-form-deformation) 
+* [Three.js Fundamentals](https://threejs.org/manual/#en/fundamentals)
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- MODEL -->
-## Model
-Models I used
-- [Face Detection](https://github.com/justadudewhohacks/face-api.js-models/tree/master/ssd_mobilenetv1)
-- [Mask Classifier](https://teachablemachine.withgoogle.com/models/wJeEWVm8t/)
-
-<!-- BLOG -->
-## Blog 
-Checkout the blog where I write how I made this project 
-
-[CVisor](https://dev.to/shoray2002/cvisor-using-computer-vision-to-stop-covid-19-10ka)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 <!-- LICENSE -->
 ## License
 
@@ -120,7 +94,7 @@ Distributed under the MIT License. See [`LICENSE.txt`](/LICENSE.txt) for more in
 
 Shoray - [@ShoraySinghal](https://twitter.com/ShoraySinghal) - shoryasinghall@gmail.com
 
-Deployment Link: [CVisor](https://cvisor.netlify.app/)
+Deployment Link: [molars](https://molars.netlify.app/)
 
 Personal Website: [LordShorya](lordshoray.is-a.dev)
 
