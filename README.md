@@ -20,6 +20,7 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
+    <li><a href="#usage">Usage</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -27,8 +28,6 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-<!--     <li><a href="#usage">Usage</a></li> -->
-<!--     <li><a href="#model">Model</a></li> -->
     <li><a href="#links">Useful Links</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -43,7 +42,9 @@ Mplars is a crossplatform webapp aimed to help dental professionals analyse vari
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
+<!-- USAGE -->
+## Usage
+The 
 
 ### Built With
 
@@ -74,6 +75,8 @@ To get a local copy up and running follow these simple example steps.
   The Project is now running locally
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+
 
 <!-- LINKS -->
 ## Links
