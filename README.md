@@ -140,9 +140,11 @@ To get a local copy up and running follow these simple example steps.
 <!-- Contributing -->
 ## Contributing
 ```
-  The code is very sphagetti at some places and missing some features. Feel free to take on any issue and even create new ones for things you consider this project lacks.
+  The code is very sphagetti at some places and missing some features. Feel free to take on any issue 
+  and even create new ones for things you consider this project lacks. Check out the links above if 
+  you want a brief overview of tech used here and don't hesitate to ping me in case you get stuck.
 ```  
-  **Warning: There are numerous differences between Threejs v75 and latest. So cross compatibality may be a problem at some places.**
+  **Warning: There are numerous differences between Threejs v75 and [latest](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene). So cross compatibality may be a problem at some places.**
   
   
 <p align="right">(<a href="#top">back to top</a>)</p>
