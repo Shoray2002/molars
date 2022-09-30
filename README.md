@@ -29,6 +29,7 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
+    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#links">Useful Links</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -129,13 +130,21 @@ To get a local copy up and running follow these simple example steps.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 <!-- LINKS -->
 ## Links
 * [Free Functional Deform](https://github.com/glennchun/free-form-deformation) 
 * [Three.js Fundamentals](https://threejs.org/manual/#en/fundamentals)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
 
+<!-- Contributing -->
+## Contributing
+```
+  The code is very sphagetti at some places and missing some features. Feel free to take on any issue and even create new ones for things you consider this project lacks.
+```  
+  **Warning: There are numerous differences between Threejs v75 and latest. So cross compatibality may be a problem at some places.**
+  
+  
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- LICENSE -->
