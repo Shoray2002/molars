@@ -54,8 +54,20 @@ The webapp works by rendering the given [models](/models) on a HTML canvas using
   deformation using the arrows. Unselection works in a stacked manner, just double click and the app will unselect the
   last selected item, successive double clicks can be used to unselect everything
   ```
-  
-* 
+  <video src="https://user-images.githubusercontent.com/76423272/193344921-33843477-7907-45af-8bad-49f0a33f26c2.mp4"  alt="1" >
+
+* ### Opacity
+   ```
+   Control the Opacity of the jaw model
+   ```
+   <table style="padding:10px">
+  <tr>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193342610-50a61d02-f590-4308-a3dd-2a313d090054.png"  alt="1" ></td>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193342714-fe72fc11-eee7-4de5-ba7f-b7f1cfcfffae.png"  alt="1" ></td>
+  </tr>
+  </table>
+
+ 
 * ### Wireframe 
    ```
    Wireframe material on the models to show the intricracies of the model geometry
@@ -63,31 +75,27 @@ The webapp works by rendering the given [models](/models) on a HTML canvas using
    <table style="padding:10px">
   <tr>
     <td> <img src="https://user-images.githubusercontent.com/76423272/193341577-fa7ccc0b-b02a-41cb-b556-ebd962e53ab4.png"  alt="1" ></td>
-    <td> <img src="https://user-images.githubusercontent.com/76423272/193342284-d2e7b195-d300-4bfe-a5d1-9f2d962faca4.png"  alt="1" ></td>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193342284-d2e7b195-d300-4bfe-a5d1-9f2d962faca4.png"  alt="2" ></td>
   </tr>
-</table>
-
-* ### Opacity 
+  </table>
+  
+* ### Deformation Point Multiplier 
    ```
-   Control the Opacity of the jaw model
+   Changes the DPM to 2X, 3X or 4X
    ```
    <table style="padding:10px">
   <tr>
-    <td> <img src="https://user-images.githubusercontent.com/76423272/193342610-50a61d02-f590-4308-a3dd-2a313d090054.png"  alt="1" ></td>
-    <td> <img src="https://user-images.githubusercontent.com/76423272/193342714-fe72fc11-eee7-4de5-ba7f-b7f1cfcfffae.png"  alt="1" ></td>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193345420-fabc94ea-f6f4-4c4d-8bec-1a5314a3d74c.png"  alt="1" ></td>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193345511-f3747b1d-ae50-4f04-93c5-67aaf09fe7a6.png"  alt="2" ></td>
+    <td> <img src="https://user-images.githubusercontent.com/76423272/193345600-ea3933c1-2c03-4205-8d07-8d6942ff5849.png"  alt="3" ></td>
+    
   </tr>
-</table>
+  </table>
 
-* ### Opacity 
+* ### Export
+  ```
+   Export the modified models as .stls. Currently only exporting as base64 strings
    ```
-   Control the Opacity of the jaw model
-   ```
-   <table style="padding:10px">
-  <tr>
-    <td> <img src="https://user-images.githubusercontent.com/76423272/193342610-50a61d02-f590-4308-a3dd-2a313d090054.png"  alt="1" ></td>
-    <td> <img src="https://user-images.githubusercontent.com/76423272/193342714-fe72fc11-eee7-4de5-ba7f-b7f1cfcfffae.png"  alt="1" ></td>
-  </tr>
-</table>
 
 
 ### Built With
