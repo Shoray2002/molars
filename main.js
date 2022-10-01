@@ -179,20 +179,14 @@ exportButton.addEventListener("click", () => {
   );
 });
 
-saveButton.addEventListener("click", function () {
-  console.log("APPLY TRANSFORM TO TOOTH");
-  let mesh = group.children.find(function (child) {
-    return child.name == matrixFileName;
-  });
-  console.log(mesh.children[0].name);
-  mesh.children[0].applyMatrix4(fMatrix);
-  // applyM4(
-  //   "t8.obj",
-  //   new THREE.Matrix4().set(
-  //     1.01,0,0,0,0,1.132,0,0,0,0,1.15,0,0,0,0,1.14
-  //   )
-  // );
-});
+// saveButton.addEventListener("click", function () {
+//   console.log("APPLY TRANSFORM TO TOOTH");
+//   let mesh = group.children.find(function (child) {
+//     return child.name == matrixFileName;
+//   });
+//   console.log(mesh.children[0].name);
+//   mesh.children[0].applyMatrix4(fMatrix);
+// });
 
 testButton.addEventListener("click", function () {
   if (!models_loaded) {
@@ -619,8 +613,6 @@ function applyM4(name, matrix) {
         mesh.matrixWorldUpdate=true;
         mesh.matrix.copy(matrix);
         mesh.updateMatrixWorld();
-        
-        console.log(mesh.matrix);
         let stl = exporter.parse(mesh);
         let blob = new Blob([stl]);
 
@@ -634,6 +626,7 @@ function applyM4(name, matrix) {
           linkData.push(base64Str);
           blobIDs.push(group.children[i].name);
           // console.log(filename);
+          console.log(base64Str);
           return base64Str;
         });
       }
