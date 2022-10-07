@@ -13,7 +13,7 @@ let camera,
   group,
   selected_model,
   last_model,
-  copy_mesh;
+  mesh;
 let latesttap;
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
@@ -174,34 +174,19 @@ exportButton.addEventListener("click", () => {
   applyM4(
     "t8.obj",
     new THREE.Matrix4().set(
-      11,
-      12,
-      13,
-      14,
-      21,
-      22,
-      23,
-      24,
-      31,
-      32,
-      33,
-      34,
-      41,
-      42,
-      43,
-      44
+      1,0,0,0,0,1.132,0,0,0,0,1.3,0,0,0,0,1
     )
   );
 });
 
-saveButton.addEventListener("click", function () {
-  console.log("APPLY TRANSFORM TO TOOTH");
-  let mesh = group.children.find(function (child) {
-    return child.name == matrixFileName;
-  });
-  console.log(mesh.children[0].name);
-  mesh.children[0].applyMatrix4(fMatrix);
-});
+// saveButton.addEventListener("click", function () {
+//   console.log("APPLY TRANSFORM TO TOOTH");
+//   let mesh = group.children.find(function (child) {
+//     return child.name == matrixFileName;
+//   });
+//   console.log(mesh.children[0].name);
+//   mesh.children[0].applyMatrix4(fMatrix);
+// });
 
 testButton.addEventListener("click", function () {
   if (!models_loaded) {
@@ -602,7 +587,7 @@ function blobToBase64(blob, cb) {
   reader.onload = function () {
     let dataUrl = reader.result;
     let base64 = dataUrl.split(",")[1];
-    console.log(base64);
+    // console.log(base64);
     cb(base64, blob.type);
   };
   reader.readAsDataURL(blob);
@@ -623,16 +608,12 @@ function applyM4(name, matrix) {
         edited_models.includes(group.children[i].name) &&
         group.children[i].name === name
       ) {
-        console.log(group.children[i].name);
-        copy_mesh = group.children[i].clone();
-        // convert copy_mesh to objecct
-        let object = new THREE.Object3D();
-        object.add(copy_mesh);
-        object.name = name;
-        console.log(object);
-        object.applyMatrix4(matrix);
-        console.log("applied");
-        let stl = exporter.parse(copy_mesh);
+        mesh = group.children[i];
+        mesh.matrixAutoUpdate = false;
+        mesh.matrixWorldUpdate=true;
+        mesh.matrix.copy(matrix);
+        mesh.updateMatrixWorld();
+        let stl = exporter.parse(mesh);
         let blob = new Blob([stl]);
 
         // let link = document.createElement("a");
@@ -644,7 +625,8 @@ function applyM4(name, matrix) {
           base64Models[group.children[i].name] = base64Str;
           linkData.push(base64Str);
           blobIDs.push(group.children[i].name);
-          console.log(filename);
+          // console.log(filename);
+          console.log(base64Str);
           return base64Str;
         });
       }
