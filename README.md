@@ -29,8 +29,8 @@
     </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#links">Useful Links</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="#license">License</a></li>
   </ol>
 </details>
 
@@ -147,14 +147,6 @@ To get a local copy up and running follow these simple example steps.
   
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- LICENSE -->
-
-## License
-
-Distributed under the MIT License. See [`LICENSE.txt`](/LICENSE.txt) for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 <!-- CONTACT -->
 ## Contact
 
@@ -165,3 +157,13 @@ Deployment Link: [molars](https://molars.netlify.app/)
 Personal Website: [LordShorya](lordshoray.is-a.dev)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- LICENSE -->
+
+## License
+
+Distributed under the MIT License. See [`LICENSE.txt`](/LICENSE.txt) for more information.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
