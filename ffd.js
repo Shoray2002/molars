@@ -1,6 +1,6 @@
 function FFD() {
-  // Returns the bounding box of the undeformed lattice.
   this.getBoundingBox = function () {
+  // Returns the bounding box of the undeformed lattice.
     return mBBox;
   };
 
