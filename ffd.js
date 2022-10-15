@@ -1,6 +1,6 @@
 function FFD() {
-  // Returns the bounding box of the undeformed lattice.
   this.getBoundingBox = function () {
+  // Returns the bounding box of the undeformed lattice.
     return mBBox;
   };
 
@@ -31,8 +31,8 @@ function FFD() {
     )
       return;
 
+      mSpanCounts = span_counts;
     mBBox = bbox;
-    mSpanCounts = span_counts;
     mCtrlPtCounts = [
       mSpanCounts[0] + 1,
       mSpanCounts[1] + 1,
