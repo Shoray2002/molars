@@ -4,16 +4,18 @@ function FFD() {
     return mBBox;
   };
 
+   // Returns the total number of control points.
+  this.getTotalCtrlPtCount = function () {
+    return mTotalCtrlPtCount;
+  };
+  
   // Returns the number of control points on the given parameter direction.
   // direction: 0 for S, 1 for T, and 2 for U.
   this.getCtrlPtCount = function (direction) {
     return mCtrlPtCounts[direction];
   };
 
-  // Returns the total number of control points.
-  this.getTotalCtrlPtCount = function () {
-    return mTotalCtrlPtCount;
-  };
+  
 
   // Converts the given ternary index to a unary index.
   this.getIndex = function (i, j, k) {
