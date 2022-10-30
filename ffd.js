@@ -8,7 +8,7 @@ function FFD() {
   this.getTotalCtrlPtCount = function () {
     return mTotalCtrlPtCount;
   };
-  
+
   // Returns the number of control points on the given parameter direction.
   // direction: 0 for S, 1 for T, and 2 for U.
   this.getCtrlPtCount = function (direction) {
@@ -20,6 +20,29 @@ function FFD() {
   // Converts the given ternary index to a unary index.
   this.getIndex = function (i, j, k) {
     return i * mCtrlPtCounts[1] * mCtrlPtCounts[2] + j * mCtrlPtCounts[2] + k;
+  };
+
+
+   // Evaluates the volume at (s, t, u) parameters
+  // where each parameter ranges from 0 to 1.
+  this.evalTrivariate = function (s, t, u) {
+    var eval_pt = new THREE.Vector3(0, 0, 0);
+    for (var i = 0; i < mCtrlPtCounts[0]; i++) {
+      var point1 = new THREE.Vector3(0, 0, 0);
+      for (var j = 0; j < mCtrlPtCounts[1]; j++) {
+        var point2 = new THREE.Vector3(0, 0, 0);
+        for (var k = 0; k < mCtrlPtCounts[2]; k++) {
+          var position = this.getPositionTernary(i, j, k);
+          var poly_u = bernstein(mSpanCounts[2], k, u);
+          point2.addScaledVector(position, poly_u);
+        }
+        var poly_t = bernstein(mSpanCounts[1], j, t);
+        point1.addScaledVector(point2, poly_t);
+      }
+      var poly_s = bernstein(mSpanCounts[0], i, s);
+      eval_pt.addScaledVector(point1, poly_s);
+    }
+    return eval_pt;
   };
 
   // Rebuilds the lattice with new control points.
@@ -65,27 +88,7 @@ function FFD() {
     }
   };
 
-  // Evaluates the volume at (s, t, u) parameters
-  // where each parameter ranges from 0 to 1.
-  this.evalTrivariate = function (s, t, u) {
-    var eval_pt = new THREE.Vector3(0, 0, 0);
-    for (var i = 0; i < mCtrlPtCounts[0]; i++) {
-      var point1 = new THREE.Vector3(0, 0, 0);
-      for (var j = 0; j < mCtrlPtCounts[1]; j++) {
-        var point2 = new THREE.Vector3(0, 0, 0);
-        for (var k = 0; k < mCtrlPtCounts[2]; k++) {
-          var position = this.getPositionTernary(i, j, k);
-          var poly_u = bernstein(mSpanCounts[2], k, u);
-          point2.addScaledVector(position, poly_u);
-        }
-        var poly_t = bernstein(mSpanCounts[1], j, t);
-        point1.addScaledVector(point2, poly_t);
-      }
-      var poly_s = bernstein(mSpanCounts[0], i, s);
-      eval_pt.addScaledVector(point1, poly_s);
-    }
-    return eval_pt;
-  };
+ 
 
   // Converts the given point (x, y, z) in world space to (s, t, u) in parameter space.
   this.convertToParam = function (world_pt) {
