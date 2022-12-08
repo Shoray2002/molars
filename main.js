@@ -38,6 +38,8 @@ const objects = [];
 const loaderObj = new THREE.OBJLoader();
 const loaderSTL = new THREE.STLLoader();
 let exporter = new THREE.STLBinaryExporter();
+let origin = new THREE.Vector3(0, 0, 0);
+
 // document selection
 const exportButton = document.getElementById("exportSTL");
 const testButton = document.getElementById("TEST_M");
@@ -295,7 +297,6 @@ function onDocumentMouseDown() {
       intersects[0].object.parent.name.toLowerCase() !== "origin.stl"
     ) {
       selected_model = intersects[0].object.parent;
-      console.log(lattice_vectors[selected_model.name])
       if (!edited_models.includes(selected_model.name)) {
         edited_models.push(selected_model.name);
       }
@@ -350,6 +351,7 @@ function addModels() {
     let properPath = folderpath + "/" + filenames[i];
     let subd_modifier = new THREE.SubdivisionModifier(0);
     let orig_geom = new THREE.Geometry();
+    let centroid_model = new THREE.Vector3(0, 0, 0);
     if (filenames[i].toLowerCase().includes(".obj")) {
       loaderObj.load(
         properPath,
@@ -374,20 +376,15 @@ function addModels() {
               smooth_geom,
               smooth_materials_teeth
             );
-            let origin = new THREE.Vector3(0, 0, 0);
-            let centroid = new THREE.Vector3(0, 0, 0);
+            centroid_model = new THREE.Vector3(0, 0, 0);
             for (let i = 0; i < smooth_geom.vertices.length; i++) {
-              centroid.add(smooth_geom.vertices[i]);
+              centroid_model.add(smooth_geom.vertices[i]);
             }
-            centroid.divideScalar(smooth_geom.vertices.length);
-            let sphere_geom = new THREE.SphereGeometry(2, 32, 32);
-            let sphere = new THREE.Mesh(sphere_geom, smooth_materials_teeth[0]);
-            sphere.position.copy(centroid);
-            scene.add(sphere);
-            let vector = new THREE.Vector3().subVectors(centroid, origin);
+            centroid_model.divideScalar(smooth_geom.vertices.length);
+            let vector = new THREE.Vector3().subVectors(centroid_model, origin);
             let arrowHelper = new THREE.ArrowHelper(
               vector.clone().normalize(),
-              centroid,
+              centroid_model,
               100,
               0x0000ff
             );
@@ -437,6 +434,20 @@ function addModels() {
               smooth_geom,
               smooth_materials_teeth
             );
+          centroid_model = new THREE.Vector3(0, 0, 0);
+          for (let i = 0; i < smooth_geom.vertices.length; i++) {
+            centroid_model.add(smooth_geom.vertices[i]);
+          }
+          centroid_model.divideScalar(smooth_geom.vertices.length);
+          let vector = new THREE.Vector3().subVectors(centroid_model, origin);
+          let arrowHelper = new THREE.ArrowHelper(
+            vector.clone().normalize(),
+            centroid_model,
+            100,
+            0x0000ff
+          );
+          scene.add(arrowHelper);
+          lattice_vectors[filenames[i]] = vector;
           smooth_mesh.position.set(0, 0, 0);
           smooth_mesh.name = filenames[i];
           objects.push(smooth_mesh);
@@ -468,7 +479,9 @@ function rebuildFFD(model) {
   removeLatticeLines();
   let bbox;
   bbox = new THREE.Box3();
+  console.log(bbox);
   let modified_verts = [];
+  let model_vector = lattice_vectors[model.name];
   for (let i = 0; i < model.children[0].geometry.vertices.length; i++) {
     let copy_vertex = new THREE.Vector3();
     copy_vertex.copy(
@@ -477,6 +490,38 @@ function rebuildFFD(model) {
     modified_verts.push(copy_vertex);
   }
   bbox.setFromPoints(modified_verts);
+  let centroid_bbox = new THREE.Vector3();
+  centroid_bbox.addVectors(bbox.min, bbox.max);
+  centroid_bbox.divideScalar(2);
+  let currentVector = new THREE.Vector3().subVectors(centroid_bbox, centroid_bbox);
+  console.log(currentVector);
+  console.log(centroid_bbox);
+  let angleX = centroid_bbox.angleTo(new THREE.Vector3(1, 0, 0));
+  let angleY = centroid_bbox.angleTo(new THREE.Vector3(0, 1, 0));
+  let angleZ = centroid_bbox.angleTo(new THREE.Vector3(0, 0, 1));
+  console.log(angleX, angleY, angleZ);
+// skew the bbox
+  // let rotationMatrix = new THREE.Matrix4();
+  // rotationMatrix.makeRotationAxis(new THREE.Vector3(1, 0, 0), angleX);
+  // rotationMatrix.makeRotationAxis(new THREE.Vector3(0, 1, 0), angleY);
+  // rotationMatrix.makeRotationAxis(new THREE.Vector3(0, 0, 1), angleZ);
+  
+  // bbox.applyMatrix4(rotationMatrix);
+  let arrowHelper = new THREE.ArrowHelper(
+    centroid_bbox.clone().normalize(),
+    centroid_bbox,
+    100,
+    0xff00ff
+  );
+  let arrowHelper2 = new THREE.ArrowHelper(
+    currentVector.clone().normalize(),
+    centroid_bbox,
+    100,
+    0xff0000
+  );
+
+  scene.add(arrowHelper, arrowHelper2);
+
   let span_counts_copy = [span_counts[0], span_counts[1], span_counts[2]];
   ffd.rebuildLattice(bbox, span_counts_copy);
   addCtrlPtMeshes();
