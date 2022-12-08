@@ -1,11 +1,11 @@
 // variables
 let camera,
-scene,
-renderer,
-trfm_ctrl,
-orbit_ctrl,
-orig_geom,
-smooth_mesh,
+  scene,
+  renderer,
+  trfm_ctrl,
+  orbit_ctrl,
+  orig_geom,
+  smooth_mesh,
   smooth_geom,
   group,
   smooth_materials_teeth,
@@ -32,6 +32,7 @@ let lattice_line_material = new THREE.LineBasicMaterial({
   transparent: true,
   opacity: 0.5,
 });
+let lattice_vectors = {};
 let models_loaded = false;
 const objects = [];
 const loaderObj = new THREE.OBJLoader();
@@ -174,7 +175,22 @@ exportButton.addEventListener("click", () => {
   applyM4(
     "t8.obj",
     new THREE.Matrix4().set(
-      1,0,0,0,0,1.132,0,0,0,0,1.3,0,0,0,0,1
+      1,
+      0,
+      0,
+      0,
+      0,
+      1.132,
+      0,
+      0,
+      0,
+      0,
+      1.3,
+      0,
+      0,
+      0,
+      0,
+      1
     )
   );
 });
@@ -195,6 +211,7 @@ testButton.addEventListener("click", function () {
   }
 });
 
+testButton.click();
 // event handlers
 function touchEndHandle(e) {
   e.preventDefault();
@@ -278,6 +295,7 @@ function onDocumentMouseDown() {
       intersects[0].object.parent.name.toLowerCase() !== "origin.stl"
     ) {
       selected_model = intersects[0].object.parent;
+      console.log(lattice_vectors[selected_model.name])
       if (!edited_models.includes(selected_model.name)) {
         edited_models.push(selected_model.name);
       }
@@ -351,11 +369,32 @@ function addModels() {
               smooth_geom,
               [smooth_materials_jaw[0], smooth_materials_teeth[1]]
             );
-          } else
+          } else {
             smooth_mesh = THREE.SceneUtils.createMultiMaterialObject(
               smooth_geom,
               smooth_materials_teeth
             );
+            let origin = new THREE.Vector3(0, 0, 0);
+            let centroid = new THREE.Vector3(0, 0, 0);
+            for (let i = 0; i < smooth_geom.vertices.length; i++) {
+              centroid.add(smooth_geom.vertices[i]);
+            }
+            centroid.divideScalar(smooth_geom.vertices.length);
+            let sphere_geom = new THREE.SphereGeometry(2, 32, 32);
+            let sphere = new THREE.Mesh(sphere_geom, smooth_materials_teeth[0]);
+            sphere.position.copy(centroid);
+            scene.add(sphere);
+            let vector = new THREE.Vector3().subVectors(centroid, origin);
+            let arrowHelper = new THREE.ArrowHelper(
+              vector.clone().normalize(),
+              centroid,
+              100,
+              0x0000ff
+            );
+            scene.add(arrowHelper);
+            lattice_vectors[filenames[i]] = vector;
+          }
+
           smooth_mesh.position.set(0, 0, 0);
           smooth_mesh.name = filenames[i];
           objects.push(smooth_mesh);
@@ -412,6 +451,7 @@ function addModels() {
       );
     }
   }
+  console.log(lattice_vectors);
 }
 function render() {
   renderer.render(scene, camera);
@@ -610,7 +650,7 @@ function applyM4(name, matrix) {
       ) {
         mesh = group.children[i];
         mesh.matrixAutoUpdate = false;
-        mesh.matrixWorldUpdate=true;
+        mesh.matrixWorldUpdate = true;
         mesh.matrix.copy(matrix);
         mesh.updateMatrixWorld();
         let stl = exporter.parse(mesh);
